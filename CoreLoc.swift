@@ -13,6 +13,7 @@ class CoreLoc: NSObject, CLLocationManagerDelegate {
     var locationManager = CLLocationManager()
     
     var groupsArray = [PFObject]()
+    var counter = 0
     
     override init() {
         super.init()
@@ -33,14 +34,18 @@ class CoreLoc: NSObject, CLLocationManagerDelegate {
         let lat = userLocation.coordinate.latitude;
         let point = PFGeoPoint(latitude: lat, longitude: long)
         if let currentUser = PFUser.currentUser() {
-            print("unwrapped current User")
-            
             for group in groupsArray {
                 let newLoc = PFObject(className:"UserLocHistory")
                 newLoc["user"] = currentUser.username!
                 newLoc["parent"] = group
                 newLoc["currentLoc"] = point
+                let newACL = PFACL()
+                newACL.setReadAccess(true, forUser: currentUser)
+                newACL.setWriteAccess(true, forUser: currentUser)
+                newLoc.ACL = newACL
                 newLoc.saveEventually()
+                counter++
+                print("new loc \(counter)")
             }
             
 //            if var breadCrumbs = newLoc["breadCrumbs"] as? [PFGeoPoint] {

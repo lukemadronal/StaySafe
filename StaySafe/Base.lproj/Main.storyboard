@@ -197,6 +197,9 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Map View" id="8rq-z4-ft7"/>
+                    <connections>
+                        <outlet property="friendsMap" destination="dFP-uf-vyO" id="5nB-5W-xzW"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SXc-0a-BCr" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

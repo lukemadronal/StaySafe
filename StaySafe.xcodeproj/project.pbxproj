@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		010B17811C108F2400648D46 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17801C108F2400648D46 /* MapViewController.swift */; };
 		010B17831C10A96300648D46 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17821C10A96300648D46 /* DataManager.swift */; };
+		010B17851C10DF8F00648D46 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010B17841C10DF8F00648D46 /* MapKit.framework */; };
 		014CBF741C0E35B300C93617 /* MutlipleGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */; };
 		019F8E621C0CA1FC00989BB8 /* PartyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019F8E611C0CA1FC00989BB8 /* PartyViewController.swift */; };
 		01DE96641C0C8A8C00F0888A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DE96631C0C8A8C00F0888A /* AppDelegate.swift */; };
@@ -24,6 +25,7 @@
 /* Begin PBXFileReference section */
 		010B17801C108F2400648D46 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		010B17821C10A96300648D46 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
+		010B17841C10DF8F00648D46 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutlipleGroupsViewController.swift; sourceTree = "<group>"; };
 		019F8E5C1C0C976400989BB8 /* StaySafe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "StaySafe-Bridging-Header.h"; sourceTree = "<group>"; };
 		019F8E601C0C9A9A00989BB8 /* StaySafe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "StaySafe-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
@@ -47,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				010B17851C10DF8F00648D46 /* MapKit.framework in Frameworks */,
 				01DE96761C0C8B2400F0888A /* CoreLocation.framework in Frameworks */,
 				68CA9604A4EE64A4AF919FAB /* Pods_StaySafe.framework in Frameworks */,
 			);
@@ -106,6 +109,7 @@
 		A7067BADA55D1B049B7E9E28 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				010B17841C10DF8F00648D46 /* MapKit.framework */,
 				EEF760D86AA3E4F46E757B1B /* Pods_StaySafe.framework */,
 			);
 			name = Frameworks;
@@ -146,6 +150,11 @@
 				TargetAttributes = {
 					01DE965F1C0C8A8C00F0888A = {
 						CreatedOnToolsVersion = 7.1.1;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
