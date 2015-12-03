@@ -11,57 +11,14 @@ import ParseUI
 import Parse
 
 class MutlipleGroupsViewController: UIViewController {
+
     
     var myGroupsArray = [PFObject]()
     var listOfUsers = [PFUser]()
-    //var userNameArray = [String]()
+    
+    var dataManager = DataManager()
+    
     @IBOutlet var multipleGroupsTableView: UITableView!
-    
-    //MARK: - Parse Query Method
-    func findMyGroups() {
-        let query = PFQuery(className:"Groups")
-        if let currentUser = PFUser.currentUser() {
-            query.whereKey("groupLeaderUsername", equalTo:currentUser.username!)
-            query.findObjectsInBackgroundWithBlock {
-                (objects: [PFObject]?, error: NSError?) -> Void in
-                
-                if error == nil {
-                    // The find succeeded.
-                    // Do something with the found objects
-                    if let uObjects = objects {
-                        self.myGroupsArray = uObjects
-                        dispatch_async(dispatch_get_main_queue()) {
-                            NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParse", object: nil))
-                        }
-                    }
-                } else {
-                    print("Error: \(error!) \(error!.userInfo)")
-                }
-            }
-        }
-    }
-    
-    func queryGroupListToFriendList(group: PFObject) {
-        if let uGroupList = group["groupList"] as? [String] {
-            print("unwrapped the group called \(group["groupName"])")
-            for member in uGroupList {
-                do {
-                    let user = try PFQuery.getUserObjectWithId(member)
-//                    if (!userNameArray.contains(user.username!)) {
-//                        userNameArray.append(user.username!)
-//                    }
-                    if !listOfUsers.contains(user) {
-                        print("user \(user.username!)")
-                        listOfUsers.append(user)
-                    }
-                } catch {
-                    print("error getting object ID's from groupList")
-                }
-                
-            }
-        }
-        
-    }
     
     //MARK: - Table View Methods
     
@@ -81,30 +38,25 @@ class MutlipleGroupsViewController: UIViewController {
         let indexPath = multipleGroupsTableView.indexPathForSelectedRow!
         let groupToPass = myGroupsArray[indexPath.row]
         partyViewController.currentGroup = groupToPass
+        
+        dataManager.queryGroupListToFriendList(groupToPass)
+        listOfUsers = dataManager.listOfUsers
         partyViewController.usersToAddArray = listOfUsers
         //partyViewController.friendToAddArray = userNameArray
         multipleGroupsTableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     //MARK: - Life Cycle Methods
-    
-    func dataFromParseRecieved() {
-        for group in myGroupsArray {
-            queryGroupListToFriendList(group)
-        }
-        multipleGroupsTableView.reloadData()
-    }
+   
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
-        // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         listOfUsers.removeAll()
-        findMyGroups()
+        dataManager.findMyGroups()
     }
     
     override func didReceiveMemoryWarning() {

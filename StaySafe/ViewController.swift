@@ -10,10 +10,12 @@ import Parse
 
 class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
     
+    var dataManager = DataManager()
     var coreLoc = CoreLoc.sharedInstance
     var headingOutPressed = false
     var myCurrentGroups = [PFObject]()
     var groupsCount = Int32()
+    var multipleGroupsSegue = true
     
     @IBOutlet var loginButton :UIBarButtonItem!
     @IBOutlet var headingOutButton :UIButton!
@@ -60,6 +62,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         dismissViewControllerAnimated(true, completion: nil)
         setUsernameDefault(logInController.logInView!.usernameField!.text!)
         loginButton.title = "Log Out"
+        dataManager.findMyGroups()
     }
     
     func logInViewControllerDidCancelLogIn(logInController: PFLogInViewController) {
@@ -77,7 +80,12 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     func signUpViewControllerDidCancelSignUp(signUpController: PFSignUpViewController) {
         dismissViewControllerAnimated(true, completion: nil)
     }
-    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "multipleGroupsSegue" {
+            let multipleGroupsViewController = segue.destinationViewController as! MutlipleGroupsViewController
+            multipleGroupsViewController.myGroupsArray = myCurrentGroups
+        }
+    }
     //MARK: - Interactivity Methods
     
     @IBAction func headingOutButtonPressed(sender: UIButton) {
@@ -85,9 +93,11 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         if PFUser.currentUser() != nil {
             if groupsCount > 0 {
                 performSegueWithIdentifier("multipleGroupsSegue", sender: nil)
+                multipleGroupsSegue = true
                 headingOutPressed = false
             } else {
                 performSegueWithIdentifier("headingOutSegue", sender: nil)
+                multipleGroupsSegue = false
                 headingOutPressed = false
             }
         } else {
@@ -102,7 +112,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
             query.countObjectsInBackgroundWithBlock({ (count, error) -> Void in
                 self.groupsCount = count
                 dispatch_async(dispatch_get_main_queue()) {
-                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParse", object: nil))
+                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParseVC", object: nil))
                 }
             })
         } else {
@@ -110,29 +120,37 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         }
     }
     
-    func dataFromParseRecieved() {
+    func dataFromParseRecievedVC() {
         if groupsCount > 0 {
             headingOutButton.setTitle("My Groups", forState: .Normal)
             if headingOutPressed {
                 headingOutPressed = false
                 performSegueWithIdentifier("multipleGroupsSegue", sender: nil)
+                multipleGroupsSegue = true
             }
         } else {
             headingOutButton.setTitle("Heading Out?", forState: .Normal)
             if headingOutPressed {
                 headingOutPressed = false
                 performSegueWithIdentifier("headingOutSegue", sender: nil)
+                multipleGroupsSegue = false
             }
         }
-        
     }
     
     //MARK: - Life Cycle Methods
+    
+    func dataFromParseRecieved() {
+        myCurrentGroups = dataManager.myGroupsArray
+        coreLoc.sendGroupsToCoreLoc(myCurrentGroups)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         PFUser.logOut()
         headingOutPressed = false
         loginButton.title = "LogIn"
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecievedVC", name: "receivedDataFromParseVC", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
     }
     

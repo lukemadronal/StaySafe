@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		010B17811C108F2400648D46 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17801C108F2400648D46 /* MapViewController.swift */; };
+		010B17831C10A96300648D46 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17821C10A96300648D46 /* DataManager.swift */; };
 		014CBF741C0E35B300C93617 /* MutlipleGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */; };
 		019F8E621C0CA1FC00989BB8 /* PartyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019F8E611C0CA1FC00989BB8 /* PartyViewController.swift */; };
 		01DE96641C0C8A8C00F0888A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DE96631C0C8A8C00F0888A /* AppDelegate.swift */; };
@@ -22,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		010B17801C108F2400648D46 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		010B17821C10A96300648D46 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutlipleGroupsViewController.swift; sourceTree = "<group>"; };
 		019F8E5C1C0C976400989BB8 /* StaySafe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "StaySafe-Bridging-Header.h"; sourceTree = "<group>"; };
 		019F8E601C0C9A9A00989BB8 /* StaySafe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "StaySafe-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
@@ -78,6 +80,7 @@
 				019F8E601C0C9A9A00989BB8 /* StaySafe-Bridging-Header.h */,
 				01DE96631C0C8A8C00F0888A /* AppDelegate.swift */,
 				01DE96651C0C8A8C00F0888A /* ViewController.swift */,
+				010B17821C10A96300648D46 /* DataManager.swift */,
 				01DE96771C0C8B4D00F0888A /* CoreLoc.swift */,
 				01DE96671C0C8A8C00F0888A /* Main.storyboard */,
 				010B17801C108F2400648D46 /* MapViewController.swift */,
@@ -233,6 +236,7 @@
 				01DE96781C0C8B4D00F0888A /* CoreLoc.swift in Sources */,
 				010B17811C108F2400648D46 /* MapViewController.swift in Sources */,
 				01DE96661C0C8A8C00F0888A /* ViewController.swift in Sources */,
+				010B17831C10A96300648D46 /* DataManager.swift in Sources */,
 				01DE96641C0C8A8C00F0888A /* AppDelegate.swift in Sources */,
 				019F8E621C0CA1FC00989BB8 /* PartyViewController.swift in Sources */,
 				014CBF741C0E35B300C93617 /* MutlipleGroupsViewController.swift in Sources */,
