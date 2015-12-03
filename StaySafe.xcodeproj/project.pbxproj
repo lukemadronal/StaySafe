@@ -1,0 +1,400 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		010B17811C108F2400648D46 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17801C108F2400648D46 /* MapViewController.swift */; };
+		014CBF741C0E35B300C93617 /* MutlipleGroupsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */; };
+		019F8E621C0CA1FC00989BB8 /* PartyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019F8E611C0CA1FC00989BB8 /* PartyViewController.swift */; };
+		01DE96641C0C8A8C00F0888A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DE96631C0C8A8C00F0888A /* AppDelegate.swift */; };
+		01DE96661C0C8A8C00F0888A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DE96651C0C8A8C00F0888A /* ViewController.swift */; };
+		01DE96691C0C8A8C00F0888A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 01DE96671C0C8A8C00F0888A /* Main.storyboard */; };
+		01DE966B1C0C8A8C00F0888A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 01DE966A1C0C8A8C00F0888A /* Assets.xcassets */; };
+		01DE966E1C0C8A8C00F0888A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 01DE966C1C0C8A8C00F0888A /* LaunchScreen.storyboard */; };
+		01DE96761C0C8B2400F0888A /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01DE96751C0C8B2400F0888A /* CoreLocation.framework */; };
+		01DE96781C0C8B4D00F0888A /* CoreLoc.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DE96771C0C8B4D00F0888A /* CoreLoc.swift */; };
+		68CA9604A4EE64A4AF919FAB /* Pods_StaySafe.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEF760D86AA3E4F46E757B1B /* Pods_StaySafe.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		010B17801C108F2400648D46 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MutlipleGroupsViewController.swift; sourceTree = "<group>"; };
+		019F8E5C1C0C976400989BB8 /* StaySafe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "StaySafe-Bridging-Header.h"; sourceTree = "<group>"; };
+		019F8E601C0C9A9A00989BB8 /* StaySafe-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "StaySafe-Bridging-Header.h"; sourceTree = SOURCE_ROOT; };
+		019F8E611C0CA1FC00989BB8 /* PartyViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartyViewController.swift; sourceTree = "<group>"; };
+		01DE96601C0C8A8C00F0888A /* StaySafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StaySafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		01DE96631C0C8A8C00F0888A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		01DE96651C0C8A8C00F0888A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		01DE96681C0C8A8C00F0888A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		01DE966A1C0C8A8C00F0888A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		01DE966D1C0C8A8C00F0888A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		01DE966F1C0C8A8C00F0888A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		01DE96751C0C8B2400F0888A /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		01DE96771C0C8B4D00F0888A /* CoreLoc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CoreLoc.swift; path = ../CoreLoc.swift; sourceTree = "<group>"; };
+		0226E7A1687146BF5A425F72 /* Pods-StaySafe.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StaySafe.debug.xcconfig"; path = "Pods/Target Support Files/Pods-StaySafe/Pods-StaySafe.debug.xcconfig"; sourceTree = "<group>"; };
+		3CE7DE999366EB524F7AB7ED /* Pods-StaySafe.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StaySafe.release.xcconfig"; path = "Pods/Target Support Files/Pods-StaySafe/Pods-StaySafe.release.xcconfig"; sourceTree = "<group>"; };
+		EEF760D86AA3E4F46E757B1B /* Pods_StaySafe.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StaySafe.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		01DE965D1C0C8A8C00F0888A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01DE96761C0C8B2400F0888A /* CoreLocation.framework in Frameworks */,
+				68CA9604A4EE64A4AF919FAB /* Pods_StaySafe.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01DE96571C0C8A8C00F0888A = {
+			isa = PBXGroup;
+			children = (
+				01DE96751C0C8B2400F0888A /* CoreLocation.framework */,
+				01DE96621C0C8A8C00F0888A /* StaySafe */,
+				01DE96611C0C8A8C00F0888A /* Products */,
+				323F56A9799F0B1590BE0CB9 /* Pods */,
+				A7067BADA55D1B049B7E9E28 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		01DE96611C0C8A8C00F0888A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				01DE96601C0C8A8C00F0888A /* StaySafe.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		01DE96621C0C8A8C00F0888A /* StaySafe */ = {
+			isa = PBXGroup;
+			children = (
+				019F8E601C0C9A9A00989BB8 /* StaySafe-Bridging-Header.h */,
+				01DE96631C0C8A8C00F0888A /* AppDelegate.swift */,
+				01DE96651C0C8A8C00F0888A /* ViewController.swift */,
+				01DE96771C0C8B4D00F0888A /* CoreLoc.swift */,
+				01DE96671C0C8A8C00F0888A /* Main.storyboard */,
+				010B17801C108F2400648D46 /* MapViewController.swift */,
+				014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */,
+				019F8E611C0CA1FC00989BB8 /* PartyViewController.swift */,
+				01DE966A1C0C8A8C00F0888A /* Assets.xcassets */,
+				01DE966C1C0C8A8C00F0888A /* LaunchScreen.storyboard */,
+				01DE966F1C0C8A8C00F0888A /* Info.plist */,
+				019F8E5C1C0C976400989BB8 /* StaySafe-Bridging-Header.h */,
+			);
+			path = StaySafe;
+			sourceTree = "<group>";
+		};
+		323F56A9799F0B1590BE0CB9 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				0226E7A1687146BF5A425F72 /* Pods-StaySafe.debug.xcconfig */,
+				3CE7DE999366EB524F7AB7ED /* Pods-StaySafe.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		A7067BADA55D1B049B7E9E28 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EEF760D86AA3E4F46E757B1B /* Pods_StaySafe.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		01DE965F1C0C8A8C00F0888A /* StaySafe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 01DE96721C0C8A8C00F0888A /* Build configuration list for PBXNativeTarget "StaySafe" */;
+			buildPhases = (
+				3CA148F00231D685C95D6C91 /* Check Pods Manifest.lock */,
+				01DE965C1C0C8A8C00F0888A /* Sources */,
+				01DE965D1C0C8A8C00F0888A /* Frameworks */,
+				01DE965E1C0C8A8C00F0888A /* Resources */,
+				F562B8E977456A1018EB653A /* Embed Pods Frameworks */,
+				8DDD8E1777677B7BE836D24E /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StaySafe;
+			productName = StaySafe;
+			productReference = 01DE96601C0C8A8C00F0888A /* StaySafe.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		01DE96581C0C8A8C00F0888A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0710;
+				LastUpgradeCheck = 0710;
+				ORGANIZATIONNAME = "Luke Madronal";
+				TargetAttributes = {
+					01DE965F1C0C8A8C00F0888A = {
+						CreatedOnToolsVersion = 7.1.1;
+					};
+				};
+			};
+			buildConfigurationList = 01DE965B1C0C8A8C00F0888A /* Build configuration list for PBXProject "StaySafe" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 01DE96571C0C8A8C00F0888A;
+			productRefGroup = 01DE96611C0C8A8C00F0888A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				01DE965F1C0C8A8C00F0888A /* StaySafe */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		01DE965E1C0C8A8C00F0888A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01DE966E1C0C8A8C00F0888A /* LaunchScreen.storyboard in Resources */,
+				01DE966B1C0C8A8C00F0888A /* Assets.xcassets in Resources */,
+				01DE96691C0C8A8C00F0888A /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3CA148F00231D685C95D6C91 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		8DDD8E1777677B7BE836D24E /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-StaySafe/Pods-StaySafe-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F562B8E977456A1018EB653A /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-StaySafe/Pods-StaySafe-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		01DE965C1C0C8A8C00F0888A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01DE96781C0C8B4D00F0888A /* CoreLoc.swift in Sources */,
+				010B17811C108F2400648D46 /* MapViewController.swift in Sources */,
+				01DE96661C0C8A8C00F0888A /* ViewController.swift in Sources */,
+				01DE96641C0C8A8C00F0888A /* AppDelegate.swift in Sources */,
+				019F8E621C0CA1FC00989BB8 /* PartyViewController.swift in Sources */,
+				014CBF741C0E35B300C93617 /* MutlipleGroupsViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		01DE96671C0C8A8C00F0888A /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				01DE96681C0C8A8C00F0888A /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		01DE966C1C0C8A8C00F0888A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				01DE966D1C0C8A8C00F0888A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		01DE96701C0C8A8C00F0888A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		01DE96711C0C8A8C00F0888A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		01DE96731C0C8A8C00F0888A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0226E7A1687146BF5A425F72 /* Pods-StaySafe.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				INFOPLIST_FILE = StaySafe/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = LAM.StaySafe;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "StaySafe/StaySafe-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		01DE96741C0C8A8C00F0888A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3CE7DE999366EB524F7AB7ED /* Pods-StaySafe.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				INFOPLIST_FILE = StaySafe/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = LAM.StaySafe;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "StaySafe/StaySafe-Bridging-Header.h";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		01DE965B1C0C8A8C00F0888A /* Build configuration list for PBXProject "StaySafe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				01DE96701C0C8A8C00F0888A /* Debug */,
+				01DE96711C0C8A8C00F0888A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		01DE96721C0C8A8C00F0888A /* Build configuration list for PBXNativeTarget "StaySafe" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				01DE96731C0C8A8C00F0888A /* Debug */,
+				01DE96741C0C8A8C00F0888A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 01DE96581C0C8A8C00F0888A /* Project object */;
+}
