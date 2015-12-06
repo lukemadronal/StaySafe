@@ -19,6 +19,8 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     @IBOutlet var groupNameTextField :UITextField!
     
     var contactStore = CNContactStore()
+    var dataManager = DataManager()
+    
     var usersToAddArray = [PFUser]()
     var currentGroup : PFObject?
     
@@ -81,6 +83,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         
         if let selectedUser = queryContactByEmail(contactEmail) {
             usersToAddArray.append(selectedUser)
+            friendsToAddTableView.reloadData()
         } else {
             //TODO: add a popup error message to notify a user their query is not a user
         }
@@ -136,7 +139,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     //MARK: - Interactivity Methods
     
     @IBAction func addAllButtonPressed(sender: UIButton) {
+        if groupNameTextField.text != nil {
         addUserToGroup(PFUser.currentUser()!, usersToAdd: usersToAddArray, groupName: groupNameTextField.text!)
+        } else {
+            
+        }
     }
     
     @IBAction func addFriendButtonPressed(sender: UIButton) {
@@ -148,6 +155,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     @IBAction func deleteBarButtonPressed(sender: UIBarButtonItem) {
         if let uCurrentGroup = currentGroup {
             uCurrentGroup.deleteInBackground()
+            self.navigationController!.popToRootViewControllerAnimated(true)
         } else {
             print("you need to have created a group to delete one")
         }
@@ -193,17 +201,31 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         friendsToAddTableView.reloadData()
     }
     
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let mapViewController = segue.destinationViewController as! MapViewController
+        let indexPath = friendsToAddTableView.indexPathForSelectedRow!
+        let userToPass = usersToAddArray[indexPath.row]
+        mapViewController.currentUser = userToPass
+    }
+    
     //MARK: - Life Cycle Methods
+    func sendUsersList() {
+        usersToAddArray = dataManager.listOfUsers
+        //print("PVC user list is \(usersToAddArray)")
+        friendsToAddTableView.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUsersList", name: "gotUserList", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        friendsToAddTableView.reloadData()
-        print(usersToAddArray)
-        //accessingContactStore = false
+        if let uCurrentGroup = currentGroup {
+            dataManager.queryGroupListToFriendList(uCurrentGroup)
+        }
+        
     }
     
     override func didReceiveMemoryWarning() {

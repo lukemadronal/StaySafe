@@ -15,6 +15,7 @@ class MutlipleGroupsViewController: UIViewController {
     
     var myGroupsArray = [PFObject]()
     var listOfUsers = [PFUser]()
+    var wait = false
     
     var dataManager = DataManager()
     
@@ -34,20 +35,15 @@ class MutlipleGroupsViewController: UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
         let partyViewController = segue.destinationViewController as! PartyViewController
         let indexPath = multipleGroupsTableView.indexPathForSelectedRow!
         let groupToPass = myGroupsArray[indexPath.row]
         partyViewController.currentGroup = groupToPass
-        
-        dataManager.queryGroupListToFriendList(groupToPass)
-        listOfUsers = dataManager.listOfUsers
-        partyViewController.usersToAddArray = listOfUsers
-        //partyViewController.friendToAddArray = userNameArray
         multipleGroupsTableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     //MARK: - Life Cycle Methods
-   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +51,6 @@ class MutlipleGroupsViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        listOfUsers.removeAll()
         dataManager.findMyGroups()
     }
     

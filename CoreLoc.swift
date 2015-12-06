@@ -11,57 +11,83 @@ import Parse
 class CoreLoc: NSObject, CLLocationManagerDelegate {
     static let sharedInstance = CoreLoc()
     var locationManager = CLLocationManager()
+    var dataManager = DataManager()
     
     var groupsArray = [PFObject]()
+    var usersArray = [PFUser]()
     var counter = 0
+    var otherCounter = 0
+    var testString = ""
+    var currentPoint = PFGeoPoint()
+    var mostRecentPoint = PFGeoPoint()
+    
     
     override init() {
         super.init()
         locationManager.delegate = self;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
+        //locationManager.pausesLocationUpdatesAutomatically = true
+        //locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.allowDeferredLocationUpdatesUntilTraveled(100, timeout: 60*2)
         locationManager.startUpdatingLocation()
     }
     
     func sendGroupsToCoreLoc(groups: [PFObject]) {
         groupsArray = groups
-        print("CORELOC: groupArray is \(groupsArray)")
+    }
+    
+    func sendUsersToCoreLoc(users: [PFUser]) {
+        usersArray = users
+    }
+    
+    func locationManagerDidPauseLocationUpdates(manager: CLLocationManager) {
+        print("did print")
+    }
+    
+    func locationManagerDidResumeLocationUpdates(manager: CLLocationManager) {
+        print("did resume")
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+
         let userLocation:CLLocation = locations[0]
         let long = userLocation.coordinate.longitude;
         let lat = userLocation.coordinate.latitude;
         let point = PFGeoPoint(latitude: lat, longitude: long)
-        if let currentUser = PFUser.currentUser() {
-            for group in groupsArray {
+        currentPoint = point
+        
+        if currentPoint != mostRecentPoint {
+            mostRecentPoint = currentPoint
+            if let currentUser = PFUser.currentUser() {
                 let newLoc = PFObject(className:"UserLocHistory")
                 newLoc["user"] = currentUser.username!
-                newLoc["parent"] = group
-                newLoc["currentLoc"] = point
-                let newACL = PFACL()
-                newACL.setReadAccess(true, forUser: currentUser)
-                newACL.setWriteAccess(true, forUser: currentUser)
-                newLoc.ACL = newACL
-                newLoc.saveEventually()
-                counter++
-                print("new loc \(counter)")
+                for group in groupsArray {
+                    newLoc["parent"] = group
+                    newLoc["currentLoc"] = point
+                    let newACL = PFACL()
+                    for user in usersArray {
+                        if user == currentUser {
+                            newACL.setReadAccess(true, forUser: currentUser)
+                            newACL.setWriteAccess(true, forUser: currentUser)
+                        } else {
+                            newACL.setReadAccess(true, forUser: user)
+                            newACL.setWriteAccess(false, forUser: user)
+                        }
+                    }
+                    newLoc.ACL = newACL
+                    newLoc.saveEventually()
+                }
             }
-            
-//            if var breadCrumbs = newLoc["breadCrumbs"] as? [PFGeoPoint] {
-//                print("unwrapped the breadCrumbs array")
-//                breadCrumbs.append(point)
-//                newLoc["breadCrumbs"] = breadCrumbs
-//                newLoc.saveEventually()
-//            } else {
-//                print("the breadCrumbs array didnt unwrapp creating new one ")
-//                var breadCrumbs = [PFGeoPoint]()
-//                breadCrumbs.append(point)
-//                newLoc["breadCrumbs"] = breadCrumbs
-//                newLoc.saveEventually()
-//            }
-            
+            dispatch_async(dispatch_get_main_queue()) {
+                NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "locationUpdated", object: nil))
+            }
+            counter++
+            testString = ("\(counter) \(point.latitude) \(point.longitude)")
+            print("\(counter) \(point.latitude) \(point.longitude)")
         }
+        otherCounter++
+        //print("other counter:\(otherCounter) \(point.latitude) \(point.longitude)")
 //        Do What ever you want with it
     }
 }

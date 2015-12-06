@@ -16,9 +16,11 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     var myCurrentGroups = [PFObject]()
     var groupsCount = Int32()
     var multipleGroupsSegue = true
+    var counter = 0
     
     @IBOutlet var loginButton :UIBarButtonItem!
     @IBOutlet var headingOutButton :UIButton!
+    @IBOutlet var testLabel :UILabel!
     
     //MARK: - User Default Methods
     
@@ -88,9 +90,14 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     }
     //MARK: - Interactivity Methods
     
+    @IBAction func testButtonPressed(sender: UIButton) {
+        dataManager.queryGroupListToFriendList(myCurrentGroups[0])
+    }
+    
     @IBAction func headingOutButtonPressed(sender: UIButton) {
         headingOutPressed = true
         if PFUser.currentUser() != nil {
+           print("groups count is \(groupsCount)")
             if groupsCount > 0 {
                 performSegueWithIdentifier("multipleGroupsSegue", sender: nil)
                 multipleGroupsSegue = true
@@ -143,6 +150,18 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     func dataFromParseRecieved() {
         myCurrentGroups = dataManager.myGroupsArray
         coreLoc.sendGroupsToCoreLoc(myCurrentGroups)
+        for group in myCurrentGroups {
+            dataManager.queryGroupListToFriendList(group)
+        }
+    }
+    
+    func updateLabel() {
+        testLabel.text = coreLoc.testString
+    }
+    
+    func sendUserList() {
+        coreLoc.sendUsersToCoreLoc(dataManager.listOfUsers)
+        //print("VC final user list is \(dataManager.listOfUsers)")
     }
     
     override func viewDidLoad() {
@@ -152,6 +171,8 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         loginButton.title = "LogIn"
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecievedVC", name: "receivedDataFromParseVC", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateLabel", name: "locationUpdated", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUserList", name: "gotUserList", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {

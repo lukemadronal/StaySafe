@@ -23,11 +23,12 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string></string>
+	<string>Enabling location helps you and your friends keep each other safe!</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>fetch</string>
 		<string>location</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

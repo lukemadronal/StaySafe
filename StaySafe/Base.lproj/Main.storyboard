@@ -26,6 +26,19 @@
                                     <action selector="headingOutButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="I0M-ZS-ZBI"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="n6s-FA-yoO">
+                                <rect key="frame" x="0.0" y="205" width="600" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w31-Wj-Uog">
+                                <rect key="frame" x="0.0" y="137" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="testButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="4Uk-4B-jY7"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -39,6 +52,7 @@
                     <connections>
                         <outlet property="headingOutButton" destination="MsE-KA-y6T" id="pOL-Jh-eIG"/>
                         <outlet property="loginButton" destination="Uai-eS-FGp" id="ljv-8U-MBx"/>
+                        <outlet property="testLabel" destination="n6s-FA-yoO" id="ldi-ch-Aa5"/>
                         <segue destination="HSM-Rw-MFO" kind="show" identifier="headingOutSegue" id="xQh-yU-Yna"/>
                         <segue destination="XuZ-1N-5uo" kind="show" identifier="multipleGroupsSegue" id="KBt-wM-du4"/>
                     </connections>
@@ -276,6 +290,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="QVJ-A8-xvr"/>
+        <segue reference="xQh-yU-Yna"/>
     </inferredMetricsTieBreakers>
 </document>

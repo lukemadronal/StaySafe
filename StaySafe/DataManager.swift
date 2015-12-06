@@ -14,6 +14,9 @@ class DataManager: NSObject {
     
     var myGroupsArray = [PFObject]()
     var listOfUsers = [PFUser]()
+    var userToAdd : PFUser!
+    var count = 0
+    var counter = 0
     
     
     func findMyGroups() {
@@ -39,23 +42,47 @@ class DataManager: NSObject {
         }
     }
     
-    func queryGroupListToFriendList(group: PFObject) -> [PFUser] {
+    func getListOfUsers() -> [PFUser] {
+        
+        return listOfUsers
+    }
+    
+    func queryGroupListToFriendList(group: PFObject) {
+        counter = 0
+        count = 0
+        listOfUsers.removeAll()
         if let uGroupList = group["groupList"] as? [String] {
-            print("unwrapped the group called \(group["groupName"])")
+            //print("unwrapped the group called \(group["groupName"])")
+            count = uGroupList.count
             for member in uGroupList {
-                do {
-                    let user = try PFQuery.getUserObjectWithId(member)
-                    if !listOfUsers.contains(user) {
-                        print("user \(user.username!)")
-                        listOfUsers.append(user)
+                let query = PFUser.query()
+                query!.whereKey("objectId", equalTo:member)
+                query!.findObjectsInBackgroundWithBlock({ (users, error) -> Void in
+                    if error == nil {
+                        //print(users)
+                        if let user = users![0] as? PFUser {
+                            if !self.listOfUsers.contains(user) {
+                                //print("user \(user.username!)")
+                                self.listOfUsers.append(user)
+                                self.userToAdd = user
+                                self.counter++
+                                if self.count == self.counter {
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "gotUserList", object: nil))
+                                    }
+                                }
+                            }
+                        }
+                        
+                    } else {
+                        print("in queryGroupListToFriendList \(error)")
                     }
-                } catch {
-                    print("error getting object ID's from groupList")
-                }
+                })
+                
                 
             }
+            //print("just exited the group for loop")
         }
-        return listOfUsers
     }
     
 }
