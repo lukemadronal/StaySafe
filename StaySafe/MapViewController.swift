@@ -11,13 +11,13 @@ import MapKit
 import Parse
 
 class MapViewController: UIViewController {
-    
+    var coreLoc = CoreLoc()
     var currentUser = PFUser()
     var pfGeoPointCount = Int32()
     var increment = 0
     
     @IBOutlet var friendsMap: MKMapView!
-    
+    @IBOutlet var addressSearchBar: UISearchBar!
     func countMyGroups() {
         let query = PFQuery(className:"UserLocHistory")
         query.whereKey("user", equalTo:currentUser.username!)
@@ -58,7 +58,12 @@ class MapViewController: UIViewController {
                     print("retrieved \(uObjects.count) objects")
                     for geoPoint in uObjects {
                         let geo = geoPoint["currentLoc"]
-                        self.annotationsFirstTryTest(geo.latitude, long: geo.longitude, title: geoPoint["createdAt"] as! String)
+                        
+                        let dateFormatter = NSDateFormatter()
+                        dateFormatter.dateFormat = "hh:mm MM/dd/yyyy"
+                        let dateTitle = dateFormatter.stringFromDate(geoPoint.createdAt! as NSDate)
+                        
+                        self.annotationsFirstTryTest(geo.latitude, long: geo.longitude, title: dateTitle)
                     }
                 }
             } else {
@@ -95,6 +100,21 @@ class MapViewController: UIViewController {
         self.friendsMap.addAnnotation(objectAnnotation)
     }
     
+    func mapView(mapView: MKMapView, rendererForOverlay overlay: MKOverlay) -> MKOverlayRenderer {
+        let renderer = MKPolylineRenderer(polyline: overlay as! MKPolyline)
+        renderer.strokeColor = UIColor.blueColor()
+        renderer.lineWidth = 5
+        return renderer
+    }
+    
+    //MARK: - Interactivity Methods
+    
+    @IBAction func searchBarPressed(sender: UIBarButtonItem) {
+        coreLoc.getLatLonFromAddress(addressSearchBar!.text!, map: friendsMap)
+    }
+    
+    
+    //MARK: - Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecievedVC", name: "receivedDataFromParseVC", object: nil)

@@ -35,18 +35,25 @@ class MutlipleGroupsViewController: UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
-        let partyViewController = segue.destinationViewController as! PartyViewController
-        let indexPath = multipleGroupsTableView.indexPathForSelectedRow!
-        let groupToPass = myGroupsArray[indexPath.row]
-        partyViewController.currentGroup = groupToPass
-        multipleGroupsTableView.deselectRowAtIndexPath(indexPath, animated: true)
+        if segue.identifier == "groupToPartyView" {
+            let partyViewController = segue.destinationViewController as! PartyViewController
+            let indexPath = multipleGroupsTableView.indexPathForSelectedRow!
+            let groupToPass = myGroupsArray[indexPath.row]
+            partyViewController.currentGroup = groupToPass
+            multipleGroupsTableView.deselectRowAtIndexPath(indexPath, animated: true)
+        }
+    }
+    
+    func dataFromParseRecieved() {
+        myGroupsArray = dataManager.myGroupsArray
+        multipleGroupsTableView.reloadData()
     }
     
     //MARK: - Life Cycle Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {

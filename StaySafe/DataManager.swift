@@ -14,6 +14,7 @@ class DataManager: NSObject {
     
     var myGroupsArray = [PFObject]()
     var listOfUsers = [PFUser]()
+    var userByUsername : PFUser!
     var userToAdd : PFUser!
     var count = 0
     var counter = 0
@@ -83,6 +84,26 @@ class DataManager: NSObject {
             }
             //print("just exited the group for loop")
         }
+    }
+    
+    func queryUserByUserName(username :String) {
+        let query = PFUser.query()
+        query!.whereKey("username", equalTo: username)
+        query!.findObjectsInBackgroundWithBlock { (users, error) -> Void in
+            if error == nil {
+                if let user = users![0] as? PFUser {
+                    self.userByUsername = user
+                    dispatch_async(dispatch_get_main_queue()) {
+                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "gotUserByUserName", object: nil))
+                    }
+                }
+            } else {
+                dispatch_async(dispatch_get_main_queue()) {
+                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "noUsernamePopUpErrorMessage", object: nil))
+                }
+            }
+        }
+        
     }
     
 }

@@ -6,12 +6,14 @@
 
 import UIKit
 import CoreLocation
+import MapKit
 import Parse
 
-class CoreLoc: NSObject, CLLocationManagerDelegate {
+class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
     static let sharedInstance = CoreLoc()
     var locationManager = CLLocationManager()
     var dataManager = DataManager()
+    var userLocation = CLLocation()
     
     var groupsArray = [PFObject]()
     var usersArray = [PFUser]()
@@ -51,9 +53,9 @@ class CoreLoc: NSObject, CLLocationManagerDelegate {
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 
-        let userLocation:CLLocation = locations[0]
-        let long = userLocation.coordinate.longitude;
-        let lat = userLocation.coordinate.latitude;
+        userLocation = locations[0]
+        let long = userLocation.coordinate.longitude
+        let lat = userLocation.coordinate.latitude
         let point = PFGeoPoint(latitude: lat, longitude: long)
         currentPoint = point
         
@@ -90,4 +92,61 @@ class CoreLoc: NSObject, CLLocationManagerDelegate {
         //print("other counter:\(otherCounter) \(point.latitude) \(point.longitude)")
 //        Do What ever you want with it
     }
+    
+    
+    
+    //MARK: - Rounting Methods
+    
+    func openAppleMaps(point: CLLocationCoordinate2D){
+        
+        let regionDistance:CLLocationDistance = 10000
+        let coordinates = CLLocationCoordinate2DMake(point.latitude, point.longitude)
+        let regionSpan = MKCoordinateRegionMakeWithDistance(coordinates, regionDistance, regionDistance)
+        let options = [
+            MKLaunchOptionsMapCenterKey: NSValue(MKCoordinate: regionSpan.center),
+            MKLaunchOptionsMapSpanKey: NSValue(MKCoordinateSpan: regionSpan.span)
+        ]
+        let placemark = MKPlacemark(coordinate: coordinates, addressDictionary: nil)
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = "test title"
+        mapItem.openInMapsWithLaunchOptions(options)
+    }
+    
+    func route(point: CLLocationCoordinate2D, map: MKMapView) {
+        let request = MKDirectionsRequest()
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude), addressDictionary: nil))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude), addressDictionary: nil))
+        request.requestsAlternateRoutes = true
+        request.transportType = .Walking
+        
+        let directions = MKDirections(request: request)
+        
+        directions.calculateDirectionsWithCompletionHandler { [unowned self] response, error in
+            guard let unwrappedResponse = response else { return }
+            for route in unwrappedResponse.routes {
+                map.addOverlay(route.polyline)
+                map.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)
+                for step in route.steps {
+                    print(step.instructions)
+                }
+            }
+        }
+    }
+    
+    func getLatLonFromAddress(address: String, map: MKMapView) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address, completionHandler: {(placemarks, error) -> Void in
+            if((error) != nil){
+                print("Error", error)
+            } else if let placemark = placemarks?.first {
+                //these are the coordinates i will feed into the routing methods
+                let coordinates:CLLocationCoordinate2D = placemark.location!.coordinate
+                self.openAppleMaps(coordinates)
+                self.route(coordinates, map: map)
+                print("long: \(coordinates.longitude) lat: \(coordinates.latitude)")
+            }
+        })
+    }
+    
+
 }

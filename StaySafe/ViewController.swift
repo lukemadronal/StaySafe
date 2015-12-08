@@ -64,7 +64,6 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         dismissViewControllerAnimated(true, completion: nil)
         setUsernameDefault(logInController.logInView!.usernameField!.text!)
         loginButton.title = "Log Out"
-        dataManager.findMyGroups()
     }
     
     func logInViewControllerDidCancelLogIn(logInController: PFLogInViewController) {
@@ -128,6 +127,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     }
     
     func dataFromParseRecievedVC() {
+        print("VWA count is \(groupsCount)")
         if groupsCount > 0 {
             headingOutButton.setTitle("My Groups", forState: .Normal)
             if headingOutPressed {
@@ -164,6 +164,12 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         //print("VC final user list is \(dataManager.listOfUsers)")
     }
     
+    func updateCount() {
+        myCurrentGroups.removeAll()
+        groupsCount = 0
+        countMyGroups()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         PFUser.logOut()
@@ -173,11 +179,17 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateLabel", name: "locationUpdated", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUserList", name: "gotUserList", object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateCount", name: "updatedGroup", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        myCurrentGroups.removeAll()
+        groupsCount = 0
         countMyGroups()
+        dataManager.findMyGroups()
+        print("vwa vwa vwa")
     }
     
     override func didReceiveMemoryWarning() {
