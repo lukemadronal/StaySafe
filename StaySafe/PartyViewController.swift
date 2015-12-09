@@ -17,15 +17,16 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     @IBOutlet var enterUsernameTextField :UITextField!
     @IBOutlet var friendsToAddTableView: UITableView!
     @IBOutlet var groupNameTextField :UITextField!
-    @IBOutlet var usernameTextField :UITextField!
     
     var contactStore = CNContactStore()
     var dataManager = DataManager()
     
     var usersToAddArray = [PFUser]()
+    var alreadyAddedUsers = [PFUser]()
     var currentGroup : PFObject?
     
     var noUserFound = false
+    var editingGroup = false
     
     //MARK: - Contact Methods
     func requestAccessToContactType(type: CNEntityType) {
@@ -85,8 +86,14 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         }
         
         if let selectedUser = queryContactByEmail(contactEmail) {
-            usersToAddArray.append(selectedUser)
-            friendsToAddTableView.reloadData()
+            if editingGroup {
+                print("added \(selectedUser.username) to already added users")
+                alreadyAddedUsers.append(selectedUser)
+            } else {
+                usersToAddArray.append(selectedUser)
+                friendsToAddTableView.reloadData()
+            }
+            
         } else {
             noUserFound = true
         }
@@ -106,6 +113,30 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         } catch {
             return nil
         }
+    }
+    
+    func editGroup() {
+        var userList = currentGroup!["groupList"] as! [String]
+        let newACL = currentGroup!.ACL
+        for user in alreadyAddedUsers {
+            print("alreadyaddedusers user name is: \(user.username))")
+            if !user.isEqual(PFUser.currentUser()) {
+                newACL!.setReadAccess(true, forUser: user)
+                newACL!.setWriteAccess(false, forUser: user)
+                userList.append(user.objectId!)
+
+            }
+        }
+        currentGroup!.ACL = newACL
+        currentGroup!["groupList"] = userList
+        currentGroup!.saveInBackgroundWithBlock { (success, error) -> Void in
+            if success {
+                let alert = UIAlertController(title: "Success!", message: "Your group has been successfully edited :)", preferredStyle: UIAlertControllerStyle.Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            }
+        }
+        
     }
     
     func addUserToGroup(user:PFUser, usersToAdd: [PFUser], groupName: String) {
@@ -151,7 +182,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     @IBAction func addAllButtonPressed(sender: UIButton) {
         if groupNameTextField.text != ""  {
-        addUserToGroup(PFUser.currentUser()!, usersToAdd: usersToAddArray, groupName: groupNameTextField.text!)
+            if editingGroup {
+                editGroup()
+            } else {
+                addUserToGroup(PFUser.currentUser()!, usersToAdd: usersToAddArray, groupName: groupNameTextField.text!)
+            }
             usersToAddArray.removeAll()
             currentGroup = nil
             friendsToAddTableView.reloadData()
@@ -163,7 +198,8 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     }
     
     @IBAction func searchForFriendByUsername(sender: UIButton) {
-        let username = usernameTextField!.text!
+        let username = enterUsernameTextField!.text!
+        dataManager.queryUserByUserName(username)
         
     }
     
@@ -175,10 +211,15 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     @IBAction func deleteBarButtonPressed(sender: UIBarButtonItem) {
         if let uCurrentGroup = currentGroup {
-            uCurrentGroup.deleteInBackgroundWithBlock({ (bool, error) -> Void in
-                dispatch_async(dispatch_get_main_queue()) {
-                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
+            uCurrentGroup.deleteInBackgroundWithBlock({ (success, error) -> Void in
+                if success {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
+                    }
+                } else {
+                    print("error while deleting group: \(error!.description)")
                 }
+                
             })
             self.navigationController!.popToRootViewControllerAnimated(true)
         } else {
@@ -187,7 +228,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     }
     //MARK: - TableView Methods
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-       return usersToAddArray.count
+        return usersToAddArray.count
         
     }
     
@@ -237,20 +278,46 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     //MARK: - Life Cycle Methods
     func sendUsersList() {
         usersToAddArray = dataManager.listOfUsers
-        //print("PVC user list is \(usersToAddArray)")
+        //alreadyAddedUsers = dataManager.listOfUsers
         friendsToAddTableView.reloadData()
+    }
+    
+    func addUserByUsername() {
+        if editingGroup {
+            print("added \(dataManager.userByUsername) to already added users")
+            alreadyAddedUsers.append(dataManager.userByUsername)
+            usersToAddArray.append(dataManager.userByUsername)
+        } else {
+            usersToAddArray.append(dataManager.userByUsername)
+        }
+        friendsToAddTableView.reloadData()
+        let alert = UIAlertController(title: "Success!", message: "User found! :)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func noUserNameRecieved() {
+        let alert = UIAlertController(title: "Error!", message: "There was a problem with your group, please try again later! :(", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUsersList", name: "gotUserList", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "addUserByUsername", name: "gotUserByUserName", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserNameRecieved", name: "noUsernamePopUpErrorMessage", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         if let uCurrentGroup = currentGroup {
-            print("unwrapped cuttent group")
+            print("unwrapped current group which means editing")
+            editingGroup = true
             dataManager.queryGroupListToFriendList(uCurrentGroup)
+        } else {
+            print("not editing group")
+            editingGroup = false
         }
         if noUserFound {
             let alert = UIAlertController(title: "No User", message: "No user matches your query. Try again :)", preferredStyle: UIAlertControllerStyle.Alert)

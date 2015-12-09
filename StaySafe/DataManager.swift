@@ -16,6 +16,7 @@ class DataManager: NSObject {
     var listOfUsers = [PFUser]()
     var userByUsername : PFUser!
     var userToAdd : PFUser!
+    var allGroups = [PFObject]()
     var count = 0
     var counter = 0
     
@@ -83,6 +84,32 @@ class DataManager: NSObject {
                 
             }
             //print("just exited the group for loop")
+        }
+    }
+    
+    func queryGroupsImIn() {
+        print("got into query groups im in")
+        let query = PFQuery(className:"Groups")
+        query.findObjectsInBackgroundWithBlock { (groups, error)-> Void in
+            if error == nil {
+                print("about to unwrap groups from query")
+                if let uGroups = groups {
+                    print("unwrapped groups about to go into for loop")
+                    var myGroups = [PFObject]()
+                    for group in uGroups {
+                        print("group name is \(group["groupName"]!)")
+                        if group["groupList"].containsObject(PFUser.currentUser()!.objectId!) {
+                            myGroups.append(group)
+                        }
+                    }
+                    self.allGroups = myGroups
+                    dispatch_async(dispatch_get_main_queue()) {
+                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "gotGroupsImIn", object: nil))
+                    }
+                }
+            } else {
+                print("error in query my groups: \(error!.description)")
+            }
         }
     }
     

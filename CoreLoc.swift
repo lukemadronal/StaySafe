@@ -29,10 +29,17 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         locationManager.delegate = self;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestAlwaysAuthorization()
-        //locationManager.pausesLocationUpdatesAutomatically = true
-        //locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = true
+        locationManager.allowsBackgroundLocationUpdates = true
         locationManager.allowDeferredLocationUpdatesUntilTraveled(100, timeout: 60*2)
+    }
+    
+    func startLocMonotoring() {
         locationManager.startUpdatingLocation()
+    }
+    
+    func stopLocMonotoring() {
+        locationManager.stopUpdatingLocation()
     }
     
     func sendGroupsToCoreLoc(groups: [PFObject]) {
@@ -80,9 +87,6 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
                     newLoc.ACL = newACL
                     newLoc.saveEventually()
                 }
-            }
-            dispatch_async(dispatch_get_main_queue()) {
-                NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "locationUpdated", object: nil))
             }
             counter++
             testString = ("\(counter) \(point.latitude) \(point.longitude)")

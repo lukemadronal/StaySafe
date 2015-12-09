@@ -20,7 +20,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     
     @IBOutlet var loginButton :UIBarButtonItem!
     @IBOutlet var headingOutButton :UIButton!
-    @IBOutlet var testLabel :UILabel!
+    @IBOutlet var startStopLocMonitoringButton :UIButton!
     
     //MARK: - User Default Methods
     
@@ -89,10 +89,6 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     }
     //MARK: - Interactivity Methods
     
-    @IBAction func testButtonPressed(sender: UIButton) {
-        dataManager.queryGroupListToFriendList(myCurrentGroups[0])
-    }
-    
     @IBAction func headingOutButtonPressed(sender: UIButton) {
         headingOutPressed = true
         if PFUser.currentUser() != nil {
@@ -109,6 +105,23 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         } else {
             self.loginButtonPressed(loginButton)
         }
+    }
+    
+    @IBAction func groupsImInButtonPressed(sender: UIButton) {
+        if PFUser.currentUser() == nil {
+            self.loginButtonPressed(loginButton)
+        }
+    }
+    
+    @IBAction func startStopLocationMonitoring() {
+        if startStopLocMonitoringButton.titleLabel!.text == "Done for the night?" {
+            coreLoc.stopLocMonotoring()
+            startStopLocMonitoringButton.setTitle("Track me!", forState: .Normal)
+        } else {
+            coreLoc.startLocMonotoring()
+            startStopLocMonitoringButton.setTitle("Done for the night?", forState: .Normal)
+        }
+        
     }
     
     func countMyGroups() {
@@ -155,10 +168,6 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         }
     }
     
-    func updateLabel() {
-        testLabel.text = coreLoc.testString
-    }
-    
     func sendUserList() {
         coreLoc.sendUsersToCoreLoc(dataManager.listOfUsers)
         //print("VC final user list is \(dataManager.listOfUsers)")
@@ -177,9 +186,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         loginButton.title = "LogIn"
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecievedVC", name: "receivedDataFromParseVC", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateLabel", name: "locationUpdated", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUserList", name: "gotUserList", object: nil)
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateCount", name: "updatedGroup", object: nil)
     }
     

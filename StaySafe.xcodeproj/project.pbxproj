@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		010689631C178ACC002BD342 /* GroupsImInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010689621C178ACC002BD342 /* GroupsImInViewController.swift */; };
 		010B17811C108F2400648D46 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17801C108F2400648D46 /* MapViewController.swift */; };
 		010B17831C10A96300648D46 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 010B17821C10A96300648D46 /* DataManager.swift */; };
 		010B17851C10DF8F00648D46 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 010B17841C10DF8F00648D46 /* MapKit.framework */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		010689621C178ACC002BD342 /* GroupsImInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupsImInViewController.swift; sourceTree = "<group>"; };
 		010B17801C108F2400648D46 /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		010B17821C10A96300648D46 /* DataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		010B17841C10DF8F00648D46 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
@@ -86,6 +88,7 @@
 				010B17821C10A96300648D46 /* DataManager.swift */,
 				01DE96771C0C8B4D00F0888A /* CoreLoc.swift */,
 				01DE96671C0C8A8C00F0888A /* Main.storyboard */,
+				010689621C178ACC002BD342 /* GroupsImInViewController.swift */,
 				010B17801C108F2400648D46 /* MapViewController.swift */,
 				014CBF731C0E35B300C93617 /* MutlipleGroupsViewController.swift */,
 				019F8E611C0CA1FC00989BB8 /* PartyViewController.swift */,
@@ -247,6 +250,7 @@
 				01DE96661C0C8A8C00F0888A /* ViewController.swift in Sources */,
 				010B17831C10A96300648D46 /* DataManager.swift in Sources */,
 				01DE96641C0C8A8C00F0888A /* AppDelegate.swift in Sources */,
+				010689631C178ACC002BD342 /* GroupsImInViewController.swift in Sources */,
 				019F8E621C0CA1FC00989BB8 /* PartyViewController.swift in Sources */,
 				014CBF741C0E35B300C93617 /* MutlipleGroupsViewController.swift in Sources */,
 			);
