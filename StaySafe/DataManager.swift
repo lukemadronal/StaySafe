@@ -15,6 +15,7 @@ class DataManager: NSObject {
     var myGroupsArray = [PFObject]()
     var listOfUsers = [PFUser]()
     var userByUsername : PFUser!
+    var userByPhoneNumber : PFUser!
     var userToAdd : PFUser!
     var allGroups = [PFObject]()
     var count = 0
@@ -111,6 +112,33 @@ class DataManager: NSObject {
                 print("error in query my groups: \(error!.description)")
             }
         }
+    }
+    
+    func queryUserBasedOnPhoneNumber(phoneNumbers:[String]) {
+        print("got into query phone numbas")
+        let query = PFUser.query()
+        query!.limit = 1
+        query!.whereKey("phoneNumber", containedIn: phoneNumbers)
+        query!.findObjectsInBackgroundWithBlock { (users, error) -> Void in
+            if error == nil {
+                print("error was not nil in find objects in background querybasedonphonenumba")
+                if let user = users![0] as? PFUser {
+                    self.userByPhoneNumber = user
+                    print("dispatching to gotUserByPhoneNumber")
+                    dispatch_async(dispatch_get_main_queue()) {
+                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "gotUserByPhoneNumber", object: nil))
+                    }
+                } else {
+                    print("dispatching to noUsernamePopUpErrorMessage")
+                    dispatch_async(dispatch_get_main_queue()) {
+                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "noUsernamePopUpErrorMessage", object: nil))
+                    }
+                }
+            } else {
+                print("error in query based on phone # error is: \(error!.description)")
+            }
+        }
+        print("exiting query phone numbas")
     }
     
     func queryUserByUserName(username :String) {

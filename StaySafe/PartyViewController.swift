@@ -27,6 +27,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     var noUserFound = false
     var editingGroup = false
+    var addingCurrentUser = false
     
     //MARK: - Contact Methods
     func requestAccessToContactType(type: CNEntityType) {
@@ -82,19 +83,35 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         if contact.emailAddresses.count > 0 {
             contactEmail = contact.emailAddresses[0].value as! String
         } else {
+            print("no email listed")
             contactEmail = " "
         }
         
         if let selectedUser = queryContactByEmail(contactEmail) {
-            if editingGroup {
-                print("added \(selectedUser.username) to already added users")
-                alreadyAddedUsers.append(selectedUser)
+            if !(selectedUser.objectId! == PFUser.currentUser()!.objectId) {
+                if editingGroup {
+                    print("added \(selectedUser.username) to already added users")
+                    alreadyAddedUsers.append(selectedUser)
+                } else {
+                    usersToAddArray.append(selectedUser)
+                    friendsToAddTableView.reloadData()
+                }
             } else {
-                usersToAddArray.append(selectedUser)
-                friendsToAddTableView.reloadData()
+                addingCurrentUser = true
             }
-            
         } else {
+            print("email for user not found, looking for phone number")
+            var phoneNumbers = [String]()
+            if contact.phoneNumbers.count > 0 {
+                for number in contact.phoneNumbers {
+                    phoneNumbers.append(String((number.value as? CNPhoneNumber)!.valueForKey("digits")!))
+                }
+                print("phone numbers is \(phoneNumbers)")
+            } else {
+                print("no phone numbers found")
+            }
+            print("query phone numbas is being called")
+            dataManager.queryUserBasedOnPhoneNumber(phoneNumbers)
             noUserFound = true
         }
     }
@@ -123,16 +140,20 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             if !user.isEqual(PFUser.currentUser()) {
                 newACL!.setReadAccess(true, forUser: user)
                 newACL!.setWriteAccess(false, forUser: user)
-                userList.append(user.objectId!)
-
+                if !userList.contains(user.objectId!) {
+                    userList.append(user.objectId!)
+                }
             }
         }
         currentGroup!.ACL = newACL
         currentGroup!["groupList"] = userList
+        currentGroup!["groupName"] = groupNameTextField!.text!
         currentGroup!.saveInBackgroundWithBlock { (success, error) -> Void in
             if success {
                 let alert = UIAlertController(title: "Success!", message: "Your group has been successfully edited :)", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+                    self.navigationController!.popToRootViewControllerAnimated(true)
+                }))
                 self.presentViewController(alert, animated: true, completion: nil)
             }
         }
@@ -166,8 +187,13 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                     NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
                 }
                 let alert = UIAlertController(title: "Success!", message: "Your group has been successfully created :)", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+                    self.navigationController!.popToRootViewControllerAnimated(true)
+                }))
+                
+                
                 self.presentViewController(alert, animated: true, completion: nil)
+                
             } else {
                 let alert = UIAlertController(title: "Error!", message: "There was a problem with your group, please try again later! :(", preferredStyle: UIAlertControllerStyle.Alert)
                 alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
@@ -189,7 +215,6 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             }
             usersToAddArray.removeAll()
             currentGroup = nil
-            friendsToAddTableView.reloadData()
         } else {
             let alert = UIAlertController(title: "Enter Group Name!", message: "You need to pick a group name to create a group", preferredStyle: UIAlertControllerStyle.Alert)
             alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
@@ -286,7 +311,6 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         if editingGroup {
             print("added \(dataManager.userByUsername) to already added users")
             alreadyAddedUsers.append(dataManager.userByUsername)
-            usersToAddArray.append(dataManager.userByUsername)
         } else {
             usersToAddArray.append(dataManager.userByUsername)
         }
@@ -302,11 +326,41 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func noUserNameFromPhoneNumberRecieved() {
+        let alert = UIAlertController(title: "No user found!", message: "There is no user in our data base matching that contact info :(", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func gotUserFromPhoneNumber(){
+        if let selectedUser =  dataManager.userByPhoneNumber{
+            if !(selectedUser.objectId! == PFUser.currentUser()!.objectId) {
+                if editingGroup {
+                    print("added \(selectedUser.username) to already added users")
+                    alreadyAddedUsers.append(selectedUser)
+                } else {
+                    usersToAddArray.append(selectedUser)
+                    friendsToAddTableView.reloadData()
+                }
+            } else {
+                addingCurrentUser = true
+            }
+        } else {
+            noUserFound = true
+        }
+        let alert = UIAlertController(title: "Success!", message: "User found! :)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUsersList", name: "gotUserList", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "addUserByUsername", name: "gotUserByUserName", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserNameRecieved", name: "noUsernamePopUpErrorMessage", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserNameFromPhoneNumberRecieved", name: "noPhoneNumberPopUpErrorMessage", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "gotUserFromPhoneNumber", name: "gotUserByPhoneNumber", object: nil)
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -315,6 +369,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             print("unwrapped current group which means editing")
             editingGroup = true
             dataManager.queryGroupListToFriendList(uCurrentGroup)
+            groupNameTextField.text = String(uCurrentGroup["groupName"])
         } else {
             print("not editing group")
             editingGroup = false
@@ -324,6 +379,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
             noUserFound = false
+        }
+        if addingCurrentUser {
+            let alert = UIAlertController(title: "That's you!", message: "You're already in your own group!", preferredStyle: UIAlertControllerStyle.Alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+            self.presentViewController(alert, animated: true, completion: nil)
         }
     }
     

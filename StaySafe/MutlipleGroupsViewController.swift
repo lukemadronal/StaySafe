@@ -40,6 +40,7 @@ class MutlipleGroupsViewController: UIViewController {
             let indexPath = multipleGroupsTableView.indexPathForSelectedRow!
             let groupToPass = myGroupsArray[indexPath.row]
             partyViewController.currentGroup = groupToPass
+            //partyViewController.groupNameTextField.text = String(groupToPass["groupName"]!)
             multipleGroupsTableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
     }

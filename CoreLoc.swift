@@ -22,6 +22,7 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
     var testString = ""
     var currentPoint = PFGeoPoint()
     var mostRecentPoint = PFGeoPoint()
+    var locFromAddress = CLLocationCoordinate2D()
     
     
     override init() {
@@ -59,7 +60,7 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-
+        
         userLocation = locations[0]
         let long = userLocation.coordinate.longitude
         let lat = userLocation.coordinate.latitude
@@ -94,7 +95,7 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         }
         otherCounter++
         //print("other counter:\(otherCounter) \(point.latitude) \(point.longitude)")
-//        Do What ever you want with it
+        //        Do What ever you want with it
     }
     
     
@@ -136,8 +137,7 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
             }
         }
     }
-    
-    func getLatLonFromAddress(address: String, map: MKMapView) {
+    func getLocFromAddress(address: String, map: MKMapView) {
         let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(address, completionHandler: {(placemarks, error) -> Void in
             if((error) != nil){
@@ -152,5 +152,24 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         })
     }
     
-
+    func getLatLonFromAddress(address: String) {
+        print("got inside getLatLonFromAddress")
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address, completionHandler: {(placemarks, error) -> Void in
+            print("got inside block")
+            if((error) != nil){
+                print("Error", error)
+            } else if let placemark = placemarks?.first {
+                //these are the coordinates i will feed into the routing methods
+                let coordinates:CLLocationCoordinate2D = placemark.location!.coordinate
+                self.locFromAddress = coordinates
+                dispatch_async(dispatch_get_main_queue()) {
+                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "gotLocFromSearch", object: nil))
+                }
+                print("long: \(coordinates.longitude) lat: \(coordinates.latitude)")
+            }
+        })
+    }
+    
+    
 }

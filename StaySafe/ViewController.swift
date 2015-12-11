@@ -23,7 +23,6 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     @IBOutlet var startStopLocMonitoringButton :UIButton!
     
     //MARK: - User Default Methods
-    
     func setUsernameDefault(username: String) {
         let userDefaults = NSUserDefaults.standardUserDefaults()
         userDefaults.setObject(username, forKey: "DefaultUsername")

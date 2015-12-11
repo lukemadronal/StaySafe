@@ -38,7 +38,7 @@ class MapViewController: UIViewController {
     
     func dataFromParseRecievedVC() {
         print("count is \(pfGeoPointCount)")
-        print("%: \(pfGeoPointCount % 100)")
+        print("%: \(pfGeoPointCount % 200)")
         queryUserLocHistory()
     }
     
@@ -47,8 +47,8 @@ class MapViewController: UIViewController {
     func queryUserLocHistory() {
         let query = PFQuery(className:"UserLocHistory")
         query.whereKey("user", equalTo: currentUser.username!)
-        query.limit = 100
-        query.skip = Int(100 * increment)
+        query.limit = 200
+        query.skip = Int(200 * increment)
         query.findObjectsInBackgroundWithBlock {
             (objects: [PFObject]?, error: NSError?) -> Void in
             if error == nil {
@@ -70,8 +70,8 @@ class MapViewController: UIViewController {
                 print("Error: \(error!) \(error!.userInfo)")
             }
             print("inc is \(self.increment)")
-            print("count / 100 is \(Int(self.pfGeoPointCount / 100))")
-            if self.increment < Int(self.pfGeoPointCount / 100) {
+            print("count / 100 is \(Int(self.pfGeoPointCount / 200))")
+            if self.increment < Int(self.pfGeoPointCount / 200) {
                 print("got into bottom loop. inc is \(self.increment)")
                 dispatch_async(dispatch_get_main_queue()) {
                     NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "newSkipCall", object: nil))
@@ -110,7 +110,7 @@ class MapViewController: UIViewController {
     //MARK: - Interactivity Methods
     
     @IBAction func searchBarPressed(sender: UIBarButtonItem) {
-        coreLoc.getLatLonFromAddress(addressSearchBar!.text!, map: friendsMap)
+        coreLoc.getLocFromAddress(addressSearchBar!.text!, map: friendsMap)
     }
     
     
