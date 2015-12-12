@@ -9,18 +9,29 @@ import ParseUI
 import Parse
 
 class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpViewControllerDelegate {
-    
+    //singletons
     var dataManager = DataManager()
     var coreLoc = CoreLoc.sharedInstance
-    var headingOutPressed = false
+    
+    //current users
     var myCurrentGroups = [PFObject]()
+    
+    //counters
     var groupsCount = Int32()
-    var multipleGroupsSegue = true
     var counter = 0
     
+    //state booleans
+    var multipleGroupsSegue = true
+    var groupsImInPressed = false
+    var profilePressed = false
+    var headingOutPressed = false
+    
+    //storyboard variables
     @IBOutlet var loginButton :UIBarButtonItem!
     @IBOutlet var headingOutButton :UIButton!
     @IBOutlet var startStopLocMonitoringButton :UIButton!
+    @IBOutlet var groupsImInButton: UIButton!
+    @IBOutlet var alarmsButton: UIButton!
     
     //MARK: - User Default Methods
     func setUsernameDefault(username: String) {
@@ -63,6 +74,14 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         dismissViewControllerAnimated(true, completion: nil)
         setUsernameDefault(logInController.logInView!.usernameField!.text!)
         loginButton.title = "Log Out"
+        if groupsImInPressed {
+            performSegueWithIdentifier("groupsImInSegue", sender: nil)
+            groupsImInPressed = false
+        }
+        if profilePressed {
+            performSegueWithIdentifier("profileSegue", sender: nil)
+            profilePressed = false
+        }
     }
     
     func logInViewControllerDidCancelLogIn(logInController: PFLogInViewController) {
@@ -107,8 +126,22 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     }
     
     @IBAction func groupsImInButtonPressed(sender: UIButton) {
+        groupsImInPressed = true
         if PFUser.currentUser() == nil {
             self.loginButtonPressed(loginButton)
+        } else {
+            performSegueWithIdentifier("groupsImInSegue", sender: nil)
+            groupsImInPressed = false
+        }
+    }
+    
+    @IBAction func profileBarButtonPressed(sender: UIBarButtonItem) {
+        profilePressed = true
+        if PFUser.currentUser() == nil {
+            self.loginButtonPressed(loginButton)
+        } else {
+            performSegueWithIdentifier("profileSegue", sender: nil)
+            profilePressed = false
         }
     }
     
@@ -187,6 +220,13 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUserList", name: "gotUserList", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateCount", name: "updatedGroup", object: nil)
+        let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
+        let color2 = UIColor(red: 255/255, green: 90/255, blue: 114/255, alpha: 0.85)
+        let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
+        headingOutButton.backgroundColor = color1
+        groupsImInButton.backgroundColor = color2
+        startStopLocMonitoringButton.backgroundColor = color3
+        alarmsButton.backgroundColor = color1
     }
     
     override func viewWillAppear(animated: Bool) {

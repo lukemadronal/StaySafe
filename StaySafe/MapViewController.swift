@@ -107,6 +107,29 @@ class MapViewController: UIViewController {
         return renderer
     }
     
+    func mapView(mapView: MKMapView!,
+        viewForAnnotation annotation: MKAnnotation!) -> MKAnnotationView! {
+            if annotation is MKUserLocation {
+                //return nil so map view draws "blue dot" for standard user location
+                return nil
+            }
+            
+            let reuseId = "pin"
+            
+            var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
+            if pinView == nil {
+                pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+                pinView!.canShowCallout = true
+                pinView!.animatesDrop = true
+                pinView!.pinTintColor = UIColor.purpleColor()
+            }
+            else {
+                pinView!.annotation = annotation
+            }
+            
+            return pinView
+    }
+    
     //MARK: - Interactivity Methods
     
     @IBAction func searchBarPressed(sender: UIBarButtonItem) {

@@ -17,6 +17,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     @IBOutlet var enterUsernameTextField :UITextField!
     @IBOutlet var friendsToAddTableView: UITableView!
     @IBOutlet var groupNameTextField :UITextField!
+    @IBOutlet var removeBarButtonItem: UIBarButtonItem!
     
     var contactStore = CNContactStore()
     var dataManager = DataManager()
@@ -28,6 +29,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     var noUserFound = false
     var editingGroup = false
     var addingCurrentUser = false
+    var currentUserLeadingGroup = false
     
     //MARK: - Contact Methods
     func requestAccessToContactType(type: CNEntityType) {
@@ -139,7 +141,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             print("alreadyaddedusers user name is: \(user.username))")
             if !user.isEqual(PFUser.currentUser()) {
                 newACL!.setReadAccess(true, forUser: user)
-                newACL!.setWriteAccess(false, forUser: user)
+                newACL!.setWriteAccess(true, forUser: user)
                 if !userList.contains(user.objectId!) {
                     userList.append(user.objectId!)
                 }
@@ -173,7 +175,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         
         for userToAdd in usersToAdd {
             newACL.setReadAccess(true, forUser: userToAdd)
-            newACL.setWriteAccess(false, forUser: userToAdd)
+            newACL.setWriteAccess(true, forUser: userToAdd)
             userList.append(userToAdd.objectId!)
         }
         newGroup.ACL = newACL
@@ -236,16 +238,37 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     @IBAction func deleteBarButtonPressed(sender: UIBarButtonItem) {
         if let uCurrentGroup = currentGroup {
-            uCurrentGroup.deleteInBackgroundWithBlock({ (success, error) -> Void in
-                if success {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
+            if currentUserLeadingGroup {
+                uCurrentGroup.deleteInBackgroundWithBlock({ (success, error) -> Void in
+                    if success {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
+                        }
+                    } else {
+                        print("error while deleting group: \(error!.description)")
                     }
-                } else {
-                    print("error while deleting group: \(error!.description)")
-                }
-                
-            })
+                })
+            } else {
+                print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
+                let newArray = uCurrentGroup["groupList"]
+                 let indexForUsersArray = newArray.indexOfObject(PFUser.currentUser()!.objectId!)
+                newArray.removeObject(PFUser.currentUser()!.objectId!)
+               
+                uCurrentGroup["groupList"] = newArray
+                let newACL = uCurrentGroup.ACL
+                newACL!.setReadAccess(false, forUser: PFUser.currentUser()!)
+                newACL!.setWriteAccess(false, forUser: PFUser.currentUser()!)
+                uCurrentGroup.ACL = newACL!
+               uCurrentGroup.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
+                    if success {
+                        print("success saving")
+                    } else {
+                        print("the " + error!.description)
+                    }
+                    
+                })
+                usersToAddArray.removeAtIndex(indexForUsersArray)
+            }
             self.navigationController!.popToRootViewControllerAnimated(true)
         } else {
             print("you need to have created a group to delete one")
@@ -267,30 +290,32 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     }
     
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if (editingStyle == .Delete) {
-            print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
-            
-            let userToDelete = usersToAddArray[indexPath.row]
-            let newArray = currentGroup!["groupList"]
-            newArray.removeObject(userToDelete.objectId!)
-            currentGroup!["groupList"] = newArray
-            
-            let newACL = currentGroup!.ACL
-            newACL!.setReadAccess(false, forUser: userToDelete)
-            newACL!.setWriteAccess(false, forUser: userToDelete)
-            currentGroup!.ACL = newACL!
-            
-            currentGroup!.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
-                if success {
-                    print("success saving")
-                } else {
-                    print("the " + error!.description)
-                }
+        if currentUserLeadingGroup {
+            if (editingStyle == .Delete) {
+                print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
                 
-            })
-            usersToAddArray.removeAtIndex(indexPath.row)
+                let userToDelete = usersToAddArray[indexPath.row]
+                let newArray = currentGroup!["groupList"]
+                newArray.removeObject(userToDelete.objectId!)
+                currentGroup!["groupList"] = newArray
+                
+                let newACL = currentGroup!.ACL
+                newACL!.setReadAccess(false, forUser: userToDelete)
+                newACL!.setWriteAccess(false, forUser: userToDelete)
+                currentGroup!.ACL = newACL!
+                
+                currentGroup!.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
+                    if success {
+                        print("success saving")
+                    } else {
+                        print("the " + error!.description)
+                    }
+                    
+                })
+                usersToAddArray.removeAtIndex(indexPath.row)
+            }
+            friendsToAddTableView.reloadData()
         }
-        friendsToAddTableView.reloadData()
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -370,6 +395,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             editingGroup = true
             dataManager.queryGroupListToFriendList(uCurrentGroup)
             groupNameTextField.text = String(uCurrentGroup["groupName"])
+            if PFUser.currentUser()!.username == String(uCurrentGroup["groupName"]) {
+                currentUserLeadingGroup = true
+            } else {
+                currentUserLeadingGroup = false
+            }
         } else {
             print("not editing group")
             editingGroup = false
@@ -377,7 +407,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         if noUserFound {
             let alert = UIAlertController(title: "No User", message: "No user matches your query. Try again :)", preferredStyle: UIAlertControllerStyle.Alert)
             alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
-            self.presentViewController(alert, animated: true, completion: nil)
+            presentViewController(alert, animated: true, completion: nil)
             noUserFound = false
         }
         if addingCurrentUser {
@@ -385,6 +415,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
         }
+        
     }
     
     override func didReceiveMemoryWarning() {

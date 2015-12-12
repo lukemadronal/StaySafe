@@ -67,35 +67,36 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         let point = PFGeoPoint(latitude: lat, longitude: long)
         currentPoint = point
         
-        if currentPoint != mostRecentPoint {
-            mostRecentPoint = currentPoint
-            if let currentUser = PFUser.currentUser() {
-                let newLoc = PFObject(className:"UserLocHistory")
-                newLoc["user"] = currentUser.username!
-                for group in groupsArray {
-                    newLoc["parent"] = group
-                    newLoc["currentLoc"] = point
-                    let newACL = PFACL()
-                    for user in usersArray {
-                        if user == currentUser {
-                            newACL.setReadAccess(true, forUser: currentUser)
-                            newACL.setWriteAccess(true, forUser: currentUser)
-                        } else {
-                            newACL.setReadAccess(true, forUser: user)
-                            newACL.setWriteAccess(false, forUser: user)
+        if currentPoint.distanceInMilesTo(mostRecentPoint) > 0.124274 {
+            if currentPoint != mostRecentPoint {
+                mostRecentPoint = currentPoint
+                if let currentUser = PFUser.currentUser() {
+                    let newLoc = PFObject(className:"UserLocHistory")
+                    newLoc["user"] = currentUser.username!
+                    for group in groupsArray {
+                        newLoc["parent"] = group
+                        newLoc["currentLoc"] = point
+                        let newACL = PFACL()
+                        for user in usersArray {
+                            if user == currentUser {
+                                newACL.setReadAccess(true, forUser: currentUser)
+                                newACL.setWriteAccess(true, forUser: currentUser)
+                            } else {
+                                newACL.setReadAccess(true, forUser: user)
+                                newACL.setWriteAccess(false, forUser: user)
+                            }
                         }
+                        newLoc.ACL = newACL
+                        newLoc.saveEventually()
                     }
-                    newLoc.ACL = newACL
-                    newLoc.saveEventually()
                 }
+                counter++
+                testString = ("\(counter) \(point.latitude) \(point.longitude)")
+                print("\(counter) \(point.latitude) \(point.longitude)")
             }
-            counter++
-            testString = ("\(counter) \(point.latitude) \(point.longitude)")
-            print("\(counter) \(point.latitude) \(point.longitude)")
         }
         otherCounter++
-        //print("other counter:\(otherCounter) \(point.latitude) \(point.longitude)")
-        //        Do What ever you want with it
+        print("other counter: \(otherCounter) \(point.latitude) \(point.longitude)")
     }
     
     
