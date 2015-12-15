@@ -46,6 +46,7 @@ class MapViewController: UIViewController {
     
     func queryUserLocHistory() {
         let query = PFQuery(className:"UserLocHistory")
+        print("current user is \(currentUser.username!)")
         query.whereKey("user", equalTo: currentUser.username!)
         query.limit = 200
         query.skip = Int(200 * increment)

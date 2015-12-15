@@ -12,12 +12,17 @@ import Parse
 import Contacts
 import ContactsUI
 
-class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactViewControllerDelegate {
+class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactViewControllerDelegate, UINavigationControllerDelegate {
     
     @IBOutlet var enterUsernameTextField :UITextField!
     @IBOutlet var friendsToAddTableView: UITableView!
     @IBOutlet var groupNameTextField :UITextField!
     @IBOutlet var removeBarButtonItem: UIBarButtonItem!
+    @IBOutlet var backgroundView: UIView!
+    @IBOutlet var searchUsernameButton :UIButton!
+    @IBOutlet var searchContactsButton :UIButton!
+    @IBOutlet var friendsToAddTopConstraint: NSLayoutConstraint!
+    @IBOutlet var friendsToAddBottomConstraint: NSLayoutConstraint!
     
     var contactStore = CNContactStore()
     var dataManager = DataManager()
@@ -30,6 +35,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     var editingGroup = false
     var addingCurrentUser = false
     var currentUserLeadingGroup = false
+    var userCannotEdit = false
     
     //MARK: - Contact Methods
     func requestAccessToContactType(type: CNEntityType) {
@@ -111,10 +117,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                 print("phone numbers is \(phoneNumbers)")
             } else {
                 print("no phone numbers found")
+                noUserFound = true
             }
             print("query phone numbas is being called")
             dataManager.queryUserBasedOnPhoneNumber(phoneNumbers)
-            noUserFound = true
+            
         }
     }
     
@@ -208,7 +215,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     //MARK: - Interactivity Methods
     
-    @IBAction func addAllButtonPressed(sender: UIButton) {
+    @IBAction func addAllButtonPressed(sender: UIBarButtonItem) {
         if groupNameTextField.text != ""  {
             if editingGroup {
                 editGroup()
@@ -251,15 +258,15 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             } else {
                 print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
                 let newArray = uCurrentGroup["groupList"]
-                 let indexForUsersArray = newArray.indexOfObject(PFUser.currentUser()!.objectId!)
+                let indexForUsersArray = newArray.indexOfObject(PFUser.currentUser()!.objectId!)
                 newArray.removeObject(PFUser.currentUser()!.objectId!)
-               
+                
                 uCurrentGroup["groupList"] = newArray
                 let newACL = uCurrentGroup.ACL
                 newACL!.setReadAccess(false, forUser: PFUser.currentUser()!)
                 newACL!.setWriteAccess(false, forUser: PFUser.currentUser()!)
                 uCurrentGroup.ACL = newACL!
-               uCurrentGroup.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
+                uCurrentGroup.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
                     if success {
                         print("success saving")
                     } else {
@@ -283,6 +290,9 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("friendsToAddCell", forIndexPath: indexPath)
         cell.textLabel!.text = usersToAddArray[indexPath.row].username!
+//        cell.contentView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
+//        cell.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
+//        cell.alpha = 0.5
         return cell
     }
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -357,6 +367,13 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func noUserMatchesQuery() {
+        let alert = UIAlertController(title: "No User", message: "No user matches your query. Try again :)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+        presentViewController(alert, animated: true, completion: nil)
+        noUserFound = false
+    }
+    
     func gotUserFromPhoneNumber(){
         if let selectedUser =  dataManager.userByPhoneNumber{
             if !(selectedUser.objectId! == PFUser.currentUser()!.objectId) {
@@ -378,6 +395,18 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    
+    
+    func keyboardWasShown(notification: NSNotification) {
+        print("keyboard was shown")
+        var info = notification.userInfo!
+        var keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
+        
+        UIView.animateWithDuration(0.1, animations: { () -> Void in
+            self.friendsToAddBottomConstraint.constant = keyboardFrame.size.height + 20
+        })
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUsersList", name: "gotUserList", object: nil)
@@ -385,11 +414,17 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserNameRecieved", name: "noUsernamePopUpErrorMessage", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserNameFromPhoneNumberRecieved", name: "noPhoneNumberPopUpErrorMessage", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "gotUserFromPhoneNumber", name: "gotUserByPhoneNumber", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserMatchesQuery", name: "noUserMatchesQuery", object: nil)
+        
         
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        friendsToAddTableView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
+//        view.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
+//        backgroundView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
+        
         if let uCurrentGroup = currentGroup {
             print("unwrapped current group which means editing")
             editingGroup = true
@@ -414,6 +449,14 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             let alert = UIAlertController(title: "That's you!", message: "You're already in your own group!", preferredStyle: UIAlertControllerStyle.Alert)
             alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
+        }
+        if userCannotEdit {
+            friendsToAddTopConstraint.constant = -backgroundView.frame.height - navigationController!.navigationBar.frame.height - UIApplication.sharedApplication().statusBarFrame.size.height
+            searchContactsButton.hidden = true
+            searchUsernameButton.hidden = true
+            groupNameTextField.hidden = true
+            enterUsernameTextField.hidden = true
+            backgroundView.hidden = true
         }
         
     }

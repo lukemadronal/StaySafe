@@ -13,6 +13,7 @@ class GroupsImInViewController: UIViewController {
     var dataManager = DataManager()
     
     var groupsImInList = [PFObject]()
+    var userCannotEdit = true
     
     @IBOutlet var groupsImInTableView : UITableView!
     
@@ -32,25 +33,31 @@ class GroupsImInViewController: UIViewController {
         let indexPath = groupsImInTableView.indexPathForSelectedRow!
         let groupToPass = groupsImInList[indexPath.row]
         partyViewController.currentGroup = groupToPass
+        if PFUser.currentUser()!.username! == String(groupToPass["groupLeaderUsername"]!) {
+            partyViewController.userCannotEdit = false
+        } else {
+            print("current user is not the leader")
+            partyViewController.userCannotEdit = true
+        }
         groupsImInTableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
-    func updateGroupsImIn() {
-        print("got into selector updateGroups")
-        groupsImInList = dataManager.allGroups
-        groupsImInTableView.reloadData()
-        
-    }
+//    func updateGroupsImIn() {
+//        print("got into selector updateGroups")
+//        groupsImInList = dataManager.allGroups
+//        groupsImInTableView.reloadData()
+//        
+//    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateGroupsImIn", name: "gotGroupsImIn", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         print("groups im in VWA")
         dataManager.queryGroupsImIn()
+       groupsImInTableView.backgroundColor = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
         
     }
 

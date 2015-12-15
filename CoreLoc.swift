@@ -51,14 +51,6 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         usersArray = users
     }
     
-    func locationManagerDidPauseLocationUpdates(manager: CLLocationManager) {
-        print("did print")
-    }
-    
-    func locationManagerDidResumeLocationUpdates(manager: CLLocationManager) {
-        print("did resume")
-    }
-    
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         userLocation = locations[0]
@@ -67,28 +59,31 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         let point = PFGeoPoint(latitude: lat, longitude: long)
         currentPoint = point
         
-        if currentPoint.distanceInMilesTo(mostRecentPoint) > 0.124274 {
+        if currentPoint.distanceInMilesTo(mostRecentPoint) > 0.02 {
             if currentPoint != mostRecentPoint {
-                mostRecentPoint = currentPoint
                 if let currentUser = PFUser.currentUser() {
                     let newLoc = PFObject(className:"UserLocHistory")
                     newLoc["user"] = currentUser.username!
+                    let newACL = PFACL()
                     for group in groupsArray {
+                        mostRecentPoint = currentPoint
                         newLoc["parent"] = group
                         newLoc["currentLoc"] = point
-                        let newACL = PFACL()
+                        
                         for user in usersArray {
-                            if user == currentUser {
-                                newACL.setReadAccess(true, forUser: currentUser)
-                                newACL.setWriteAccess(true, forUser: currentUser)
-                            } else {
-                                newACL.setReadAccess(true, forUser: user)
-                                newACL.setWriteAccess(false, forUser: user)
-                            }
+                            print("\(user.username) in \(group["groupName"])")
+                            newACL.setReadAccess(true, forUser: user)
+                            newACL.setWriteAccess(true, forUser: user)
                         }
-                        newLoc.ACL = newACL
-                        newLoc.saveEventually()
                     }
+                    newLoc.ACL = newACL
+                    newLoc.saveEventually({ (success, error) -> Void in
+                        if success {
+                            print("Successfully saved a pin")
+                        } else {
+                            print("error saving")
+                        }
+                    })
                 }
                 counter++
                 testString = ("\(counter) \(point.latitude) \(point.longitude)")

@@ -35,12 +35,9 @@ class MutlipleGroupsViewController: UIViewController {
             cellColorCounter++
         }
         let cell = tableView.dequeueReusableCellWithIdentifier("multipleGroupCell", forIndexPath: indexPath)
-        let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
-        let color2 = UIColor(red: 255/255, green: 90/255, blue: 114/255, alpha: 0.85)
-        let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
-        print("cellcolorcounter is \(cellColorCounter)")
-        cell.backgroundColor = color1
-        cell.alpha = 0.85
+//        let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
+//        let color2 = UIColor(red: 255/255, green: 90/255, blue: 114/255, alpha: 0.85)
+//        let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
         
 //        cell.backgroundColor = UIColor.clearColor()
 //        cell.contentView.backgroundColor = color1
@@ -88,8 +85,7 @@ class MutlipleGroupsViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        dataManager.findMyGroups()
-        cellColorCounter = 0
+        //dataManager.findMyGroups()
         multipleGroupsTableView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
     }
     

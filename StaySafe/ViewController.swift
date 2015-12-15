@@ -14,10 +14,12 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     var coreLoc = CoreLoc.sharedInstance
     
     //current users
+    var groupsImInList = [PFObject]()
     var myCurrentGroups = [PFObject]()
     
     //counters
     var groupsCount = Int32()
+    var groupsImInCount = Int32()
     var counter = 0
     
     //state booleans
@@ -74,6 +76,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         dismissViewControllerAnimated(true, completion: nil)
         setUsernameDefault(logInController.logInView!.usernameField!.text!)
         loginButton.title = "Log Out"
+        dataManager.countGroupsImIn()
         if groupsImInPressed {
             performSegueWithIdentifier("groupsImInSegue", sender: nil)
             groupsImInPressed = false
@@ -100,7 +103,10 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         dismissViewControllerAnimated(true, completion: nil)
     }
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "multipleGroupsSegue" {
+        if segue.identifier == "groupsImInSegue" {
+            let groupsImInViewController = segue.destinationViewController as! GroupsImInViewController
+            groupsImInViewController.groupsImInList = groupsImInList
+        } else if segue.identifier == "multipleGroupsSegue" {
             let multipleGroupsViewController = segue.destinationViewController as! MutlipleGroupsViewController
             multipleGroupsViewController.myGroupsArray = myCurrentGroups
         }
@@ -110,7 +116,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     @IBAction func headingOutButtonPressed(sender: UIButton) {
         headingOutPressed = true
         if PFUser.currentUser() != nil {
-           print("groups count is \(groupsCount)")
+           //print("groups count is \(groupsCount)")
             if groupsCount > 0 {
                 performSegueWithIdentifier("multipleGroupsSegue", sender: nil)
                 multipleGroupsSegue = true
@@ -130,8 +136,14 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         if PFUser.currentUser() == nil {
             self.loginButtonPressed(loginButton)
         } else {
-            performSegueWithIdentifier("groupsImInSegue", sender: nil)
+            
+            if groupsImInCount > 0 {
+                performSegueWithIdentifier("groupsImInSegue", sender: nil)
+            } else {
+                performSegueWithIdentifier("headingOutSegue", sender: nil)
+            }
             groupsImInPressed = false
+            
         }
     }
     
@@ -172,7 +184,7 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     }
     
     func dataFromParseRecievedVC() {
-        print("VWA count is \(groupsCount)")
+        //print("VWA count is \(groupsCount)")
         if groupsCount > 0 {
             headingOutButton.setTitle("My Groups", forState: .Normal)
             if headingOutPressed {
@@ -192,10 +204,10 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     
     //MARK: - Life Cycle Methods
     
-    func dataFromParseRecieved() {
-        myCurrentGroups = dataManager.myGroupsArray
-        coreLoc.sendGroupsToCoreLoc(myCurrentGroups)
-        for group in myCurrentGroups {
+    func updateGroupsImIn() {
+        groupsImInList = dataManager.allGroups
+        coreLoc.sendGroupsToCoreLoc(groupsImInList)
+        for group in groupsImInList {
             dataManager.queryGroupListToFriendList(group)
         }
     }
@@ -206,23 +218,42 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     }
     
     func updateCount() {
-        myCurrentGroups.removeAll()
+        groupsImInList.removeAll()
         groupsCount = 0
         countMyGroups()
     }
+    func getGroupsImInCount() {
+       groupsImInCount = dataManager.groupsImInCount
+        if groupsImInCount > 0 {
+            groupsImInButton.setTitle("Groups I'm in!", forState: .Normal)
+        } else {
+          groupsImInButton.setTitle("Create a group first!", forState: .Normal)
+        }
+    }
     
+    func dataFromParseRecieved() {
+       myCurrentGroups = dataManager.myGroupsArray
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         PFUser.logOut()
         headingOutPressed = false
         loginButton.title = "LogIn"
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecievedVC", name: "receivedDataFromParseVC", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecieved", name: "receivedDataFromParse", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "dataFromParseRecievedVC", name: "receivedDataFromParseVC", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateGroupsImIn", name: "gotGroupsImIn", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUserList", name: "gotUserList", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateCount", name: "updatedGroup", object: nil)
-        let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
-        let color2 = UIColor(red: 255/255, green: 90/255, blue: 114/255, alpha: 0.85)
-        let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "getGroupsImInCount", name: "countedGroupsImIn", object: nil)
+        
+        
+        //let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
+        let color1 = UIColor(red: 77/255, green: 174/255, blue: 255/255, alpha: 1)
+        //let color2 = UIColor(red: 77/255, green: 106/255, blue: 99/255, alpha: 0.85)        
+        let color2 = UIColor(red: 77/255, green: 128/255, blue: 255/255, alpha: 1)
+        
+        //let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
+        let color3 = UIColor(red: 69/255, green: 91/255, blue: 255/255, alpha: 1)
         headingOutButton.backgroundColor = color1
         groupsImInButton.backgroundColor = color2
         startStopLocMonitoringButton.backgroundColor = color3
@@ -231,11 +262,13 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        groupsImInList.removeAll()
         myCurrentGroups.removeAll()
         groupsCount = 0
         countMyGroups()
+        dataManager.queryGroupsImIn()
         dataManager.findMyGroups()
-        print("vwa vwa vwa")
+        //print("vwa vwa vwa")
     }
     
     override func didReceiveMemoryWarning() {
