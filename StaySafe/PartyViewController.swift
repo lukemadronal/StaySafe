@@ -286,13 +286,35 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         return usersToAddArray.count
         
     }
+    /*
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> ContactTableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! ContactTableViewCell
+        
+        let currentContact = contactArray[indexPath.row]
+        cell.nameLabel.text = filterContactsByCategory(sectionsArray[indexPath.section], sortLastName:  sortByLastName)[indexPath.row].nameLast
+        //cell.nameLabel.text = currentContact.nameLast
+        cell.emailLabel.text = "Rating: \(String(Int(currentContact.rating!))) "
+        return cell
+    }
+    */
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("friendsToAddCell", forIndexPath: indexPath)
-        cell.textLabel!.text = usersToAddArray[indexPath.row].username!
-//        cell.contentView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
-//        cell.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
-//        cell.alpha = 0.5
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UserTableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("friendsToAddCell", forIndexPath: indexPath) as! UserTableViewCell
+        cell.nameLabel.text = usersToAddArray[indexPath.row].username!
+        
+        if let profPic = usersToAddArray[indexPath.row]["imageFile"] as? PFFile {
+            profPic.getDataInBackgroundWithBlock({ (imageData, error) -> Void in
+                if error == nil {
+                    if let image = UIImage(data:(imageData)!){
+                        cell.profPicThumbnail.image = image
+                    }
+                } else {
+                    print("error in getting prof pic:\(error!.description)")
+                }
+            })
+        }
+        
         return cell
     }
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {

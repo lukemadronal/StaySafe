@@ -436,21 +436,54 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="geb-VT-odL">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="86" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="geb-VT-odL">
                                 <rect key="frame" x="0.0" y="130" width="600" height="470"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="friendsToAddCell" id="To3-LO-VPW">
-                                        <rect key="frame" x="0.0" y="92" width="600" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="friendsToAddCell" rowHeight="86" id="To3-LO-VPW" customClass="UserTableViewCell" customModule="StaySafe" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="92" width="600" height="86"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="To3-LO-VPW" id="IJ6-0R-SIK">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="85.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Csg-LW-xGr">
+                                                    <rect key="frame" x="0.0" y="0.0" width="85" height="85"/>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GQw-nr-3t3">
+                                                    <rect key="frame" x="93" y="20" width="198" height="45"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                            <constraints>
+                                                <constraint firstItem="Csg-LW-xGr" firstAttribute="top" secondItem="IJ6-0R-SIK" secondAttribute="topMargin" constant="-8" id="1lo-bg-BJy"/>
+                                                <constraint firstItem="Csg-LW-xGr" firstAttribute="width" secondItem="IJ6-0R-SIK" secondAttribute="width" multiplier="85:600" id="9py-14-zxt"/>
+                                                <constraint firstItem="GQw-nr-3t3" firstAttribute="width" secondItem="IJ6-0R-SIK" secondAttribute="width" multiplier="198:600" id="Avg-lX-wyo"/>
+                                                <constraint firstItem="Csg-LW-xGr" firstAttribute="height" secondItem="IJ6-0R-SIK" secondAttribute="height" multiplier="85:85.5" id="OA5-Uv-8i7"/>
+                                                <constraint firstItem="GQw-nr-3t3" firstAttribute="leading" secondItem="Csg-LW-xGr" secondAttribute="trailing" constant="8" id="Rus-ph-MH0"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="GQw-nr-3t3" secondAttribute="bottom" constant="13.5" id="Yhk-JN-GzS"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="Csg-LW-xGr" secondAttribute="bottom" constant="-7" id="i96-UU-xpt"/>
+                                                <constraint firstItem="GQw-nr-3t3" firstAttribute="height" secondItem="IJ6-0R-SIK" secondAttribute="height" multiplier="45:85.5" id="okH-qH-Ymb"/>
+                                                <constraint firstItem="Csg-LW-xGr" firstAttribute="leading" secondItem="IJ6-0R-SIK" secondAttribute="leadingMargin" constant="-8" id="qfI-j2-jjY"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="GQw-nr-3t3" secondAttribute="trailing" constant="332" id="uZo-6g-2JP"/>
+                                                <constraint firstItem="GQw-nr-3t3" firstAttribute="top" secondItem="IJ6-0R-SIK" secondAttribute="topMargin" constant="12" id="wxq-o2-3za"/>
+                                            </constraints>
+                                            <variation key="default">
+                                                <mask key="constraints">
+                                                    <exclude reference="i96-UU-xpt"/>
+                                                    <exclude reference="Yhk-JN-GzS"/>
+                                                    <exclude reference="uZo-6g-2JP"/>
+                                                </mask>
+                                            </variation>
                                         </tableViewCellContentView>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <connections>
+                                            <outlet property="nameLabel" destination="GQw-nr-3t3" id="Glb-1d-fQ5"/>
+                                            <outlet property="profPicThumbnail" destination="Csg-LW-xGr" id="SlX-7j-Y6R"/>
                                             <segue destination="bcm-HU-IY0" kind="show" identifier="personCellToMapSegue" id="fS6-iw-HjM"/>
                                         </connections>
                                     </tableViewCell>
@@ -882,6 +915,6 @@
         <image name="noProfPic" width="300" height="300"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="xQh-yU-Yna"/>
+        <segue reference="QVJ-A8-xvr"/>
     </inferredMetricsTieBreakers>
 </document>
