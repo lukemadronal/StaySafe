@@ -15,10 +15,11 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     
     //current users
     var groupsImInList = [PFObject]()
+    var tempGroupsImInList = [PFObject]()
     var myCurrentGroups = [PFObject]()
+    var listOfUsersByGroup = [String: [PFUser]]()
     
     //counters
-    var groupsCount = Int32()
     var groupsImInCount = Int32()
     var counter = 0
     
@@ -60,7 +61,6 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
             headingOutButton.setTitle("Heading Out?", forState: .Normal)
         } else {
             //this needs to be fixed
-            
             let loginController = PFLogInViewController()
             loginController.delegate = self
             let signupController = PFSignUpViewController()
@@ -77,6 +77,8 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         setUsernameDefault(logInController.logInView!.usernameField!.text!)
         loginButton.title = "Log Out"
         dataManager.countGroupsImIn()
+        coreLoc.currentPoint = PFGeoPoint()
+        coreLoc.mostRecentPoint = PFGeoPoint()
         if groupsImInPressed {
             performSegueWithIdentifier("groupsImInSegue", sender: nil)
             groupsImInPressed = false
@@ -116,8 +118,8 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     @IBAction func headingOutButtonPressed(sender: UIButton) {
         headingOutPressed = true
         if PFUser.currentUser() != nil {
-           //print("groups count is \(groupsCount)")
-            if groupsCount > 0 {
+           //print("groups count is \(dataManager.groupsCount)") dataManager.groupsCount
+            if dataManager.groupsCount > 0 {
                 performSegueWithIdentifier("multipleGroupsSegue", sender: nil)
                 multipleGroupsSegue = true
                 headingOutPressed = false
@@ -136,7 +138,6 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         if PFUser.currentUser() == nil {
             self.loginButtonPressed(loginButton)
         } else {
-            
             if groupsImInCount > 0 {
                 performSegueWithIdentifier("groupsImInSegue", sender: nil)
             } else {
@@ -168,24 +169,20 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         
     }
     
-    func countMyGroups() {
-        let query = PFQuery(className:"Groups")
-        if let currentUser = PFUser.currentUser() {
-            query.whereKey("groupLeaderUsername", equalTo:currentUser.username!)
-            query.countObjectsInBackgroundWithBlock({ (count, error) -> Void in
-                self.groupsCount = count
-                dispatch_async(dispatch_get_main_queue()) {
-                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParseVC", object: nil))
-                }
-            })
+    //MARK: - Notifcation Selector Methods
+    
+    func setHeadingOutButtonTitle() {
+        print("in VC my group count is \(dataManager.groupsCount)")
+        if dataManager.groupsCount > 0 {
+            headingOutButton.setTitle("My Groups", forState: .Normal)
         } else {
             headingOutButton.setTitle("Heading Out?", forState: .Normal)
         }
     }
     
     func dataFromParseRecievedVC() {
-        //print("VWA count is \(groupsCount)")
-        if groupsCount > 0 {
+        //print("VWA count is \(dataManager.groupsCount)")
+        if dataManager.groupsCount > 0 {
             headingOutButton.setTitle("My Groups", forState: .Normal)
             if headingOutPressed {
                 headingOutPressed = false
@@ -202,25 +199,46 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         }
     }
     
-    //MARK: - Life Cycle Methods
-    
     func updateGroupsImIn() {
         groupsImInList = dataManager.allGroups
         coreLoc.sendGroupsToCoreLoc(groupsImInList)
-        for group in groupsImInList {
-            dataManager.queryGroupListToFriendList(group)
+        tempGroupsImInList = groupsImInList
+        getUsersFromGroupList()
+    }
+    
+    func getUsersFromGroupList() {
+        if tempGroupsImInList.count > 0 {
+            dataManager.queryGroupListToFriendList(tempGroupsImInList.last!)
         }
     }
     
     func sendUserList() {
-        coreLoc.sendUsersToCoreLoc(dataManager.listOfUsers)
+        //every time data manager method gets called pass it a new list of people. they should run one after the other not at the same time. keep track of all of the groups you need to grab people from. after data manager sends a user list, delete that group from the list and keep doing it until the array of groups is empty
+        if (tempGroupsImInList.count > 0) {
+            tempGroupsImInList.removeLast()
+            counter++
+            dataManager.counter = 1
+            listOfUsersByGroup[dataManager.currentGroupName] = dataManager.listOfUsers
+            dataManager.listOfUsers.removeAll()
+            var finalUserList = [PFUser]()
+            //print("counter is \(counter) and groupsImInCount is \(groupsImInList.count)")
+            if counter == groupsImInList.count {
+                for users in listOfUsersByGroup {
+                    finalUserList = users.1 + finalUserList
+                }
+                coreLoc.sendUsersToCoreLoc(finalUserList)
+            } else {
+                getUsersFromGroupList()
+            }
+        }
+        //print("in send userList \(dataManager.listOfUsers)")
         //print("VC final user list is \(dataManager.listOfUsers)")
     }
     
     func updateCount() {
         groupsImInList.removeAll()
-        groupsCount = 0
-        countMyGroups()
+        dataManager.groupsCount = 0
+        dataManager.countMyGroups()
     }
     func getGroupsImInCount() {
        groupsImInCount = dataManager.groupsImInCount
@@ -234,6 +252,9 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
     func dataFromParseRecieved() {
        myCurrentGroups = dataManager.myGroupsArray
     }
+    
+    //MARK: - Life Cycle Methods
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         PFUser.logOut()
@@ -264,10 +285,11 @@ class ViewController: UIViewController, PFLogInViewControllerDelegate, PFSignUpV
         super.viewWillAppear(animated)
         groupsImInList.removeAll()
         myCurrentGroups.removeAll()
-        groupsCount = 0
-        countMyGroups()
+        dataManager.groupsCount = 0
+        dataManager.countMyGroups()
         dataManager.queryGroupsImIn()
         dataManager.findMyGroups()
+        setHeadingOutButtonTitle()
         //print("vwa vwa vwa")
     }
     

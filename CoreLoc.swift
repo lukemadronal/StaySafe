@@ -41,6 +41,8 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
     
     func stopLocMonotoring() {
         locationManager.stopUpdatingLocation()
+        mostRecentPoint = PFGeoPoint()
+        currentPoint = PFGeoPoint()
     }
     
     func sendGroupsToCoreLoc(groups: [PFObject]) {
@@ -59,22 +61,20 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
         let point = PFGeoPoint(latitude: lat, longitude: long)
         currentPoint = point
         
-        if currentPoint.distanceInMilesTo(mostRecentPoint) > 0.02 {
+        if currentPoint.distanceInMilesTo(mostRecentPoint) > 0.03 {
             if currentPoint != mostRecentPoint {
                 if let currentUser = PFUser.currentUser() {
                     let newLoc = PFObject(className:"UserLocHistory")
                     newLoc["user"] = currentUser.username!
                     let newACL = PFACL()
-                    for group in groupsArray {
+                    newLoc["currentLoc"] = point
+                    if usersArray.count > 0 {
                         mostRecentPoint = currentPoint
-                        newLoc["parent"] = group
-                        newLoc["currentLoc"] = point
-                        
-                        for user in usersArray {
-                            print("\(user.username) in \(group["groupName"])")
-                            newACL.setReadAccess(true, forUser: user)
-                            newACL.setWriteAccess(true, forUser: user)
-                        }
+                    }
+                    for user in usersArray {
+                        print("\(user.username!)")
+                        newACL.setReadAccess(true, forUser: user)
+                        newACL.setWriteAccess(true, forUser: user)
                     }
                     newLoc.ACL = newACL
                     newLoc.saveEventually({ (success, error) -> Void in
@@ -87,11 +87,11 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
                 }
                 counter++
                 testString = ("\(counter) \(point.latitude) \(point.longitude)")
-                print("\(counter) \(point.latitude) \(point.longitude)")
+                //print("\(counter) \(point.latitude) \(point.longitude)")
             }
         }
         otherCounter++
-        print("other counter: \(otherCounter) \(point.latitude) \(point.longitude)")
+        //print("other counter: \(otherCounter) \(point.latitude) \(point.longitude)")
     }
     
     
@@ -149,10 +149,10 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
     }
     
     func getLatLonFromAddress(address: String) {
-        print("got inside getLatLonFromAddress")
+        //print("got inside getLatLonFromAddress")
         let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(address, completionHandler: {(placemarks, error) -> Void in
-            print("got inside block")
+            //print("got inside block")
             if((error) != nil){
                 print("Error", error)
             } else if let placemark = placemarks?.first {
@@ -162,7 +162,7 @@ class CoreLoc: NSObject, CLLocationManagerDelegate, MKMapViewDelegate {
                 dispatch_async(dispatch_get_main_queue()) {
                     NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "gotLocFromSearch", object: nil))
                 }
-                print("long: \(coordinates.longitude) lat: \(coordinates.latitude)")
+                //print("long: \(coordinates.longitude) lat: \(coordinates.latitude)")
             }
         })
     }

@@ -11,38 +11,27 @@ import MapKit
 import Parse
 
 class MapViewController: UIViewController {
+    
+    //singletons
+    var dataManager = DataManager()
+    
     var coreLoc = CoreLoc()
     var currentUser = PFUser()
-    var pfGeoPointCount = Int32()
     var increment = 0
     
     @IBOutlet var friendsMap: MKMapView!
     @IBOutlet var addressSearchBar: UISearchBar!
-    func countMyGroups() {
-        let query = PFQuery(className:"UserLocHistory")
-        query.whereKey("user", equalTo:currentUser.username!)
-        query.countObjectsInBackgroundWithBlock({ (count, error) -> Void in
-            self.pfGeoPointCount = count
-            dispatch_async(dispatch_get_main_queue()) {
-                NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParseVC", object: nil))
-            }
-        })
-        
-    }
     
     func incrementSkip() {
         increment++
         queryUserLocHistory()
-        
     }
     
     func dataFromParseRecievedVC() {
-        print("count is \(pfGeoPointCount)")
-        print("%: \(pfGeoPointCount % 200)")
+        print("count is \(dataManager.pfGeoPointCount)")
+        print("%: \(dataManager.pfGeoPointCount % 200)")
         queryUserLocHistory()
     }
-    
-    
     
     func queryUserLocHistory() {
         let query = PFQuery(className:"UserLocHistory")
@@ -64,15 +53,15 @@ class MapViewController: UIViewController {
                         dateFormatter.dateFormat = "hh:mm MM/dd/yyyy"
                         let dateTitle = dateFormatter.stringFromDate(geoPoint.createdAt! as NSDate)
                         
-                        self.annotationsFirstTryTest(geo.latitude, long: geo.longitude, title: dateTitle)
+                        self.addAnnotationToMapView(geo.latitude, long: geo.longitude, title: dateTitle)
                     }
                 }
             } else {
                 print("Error: \(error!) \(error!.userInfo)")
             }
             print("inc is \(self.increment)")
-            print("count / 100 is \(Int(self.pfGeoPointCount / 200))")
-            if self.increment < Int(self.pfGeoPointCount / 200) {
+            print("count / 100 is \(Int(self.dataManager.pfGeoPointCount / 200))")
+            if self.increment < Int(self.dataManager.pfGeoPointCount / 200) {
                 print("got into bottom loop. inc is \(self.increment)")
                 dispatch_async(dispatch_get_main_queue()) {
                     NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "newSkipCall", object: nil))
@@ -83,7 +72,7 @@ class MapViewController: UIViewController {
     }
     
     
-    func annotationsFirstTryTest(lat: Double, long: Double, title: String) {
+    func addAnnotationToMapView(lat: Double, long: Double, title: String) {
         let latDelta:CLLocationDegrees = 0.01
         
         let longDelta:CLLocationDegrees = 0.01
@@ -122,7 +111,7 @@ class MapViewController: UIViewController {
                 pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
                 pinView!.canShowCallout = true
                 pinView!.animatesDrop = true
-                pinView!.pinTintColor = UIColor.purpleColor()
+                pinView!.pinTintColor = UIColor(red: 125/255, green: 174/255, blue: 255/255, alpha: 1)
             }
             else {
                 pinView!.annotation = annotation
@@ -146,8 +135,8 @@ class MapViewController: UIViewController {
     }
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        countMyGroups()
-        pfGeoPointCount = 0
+        dataManager.countUserLocHistory()
+        dataManager.pfGeoPointCount = 0
         increment = 0
     }
     

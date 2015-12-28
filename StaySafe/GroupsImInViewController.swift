@@ -36,29 +36,31 @@ class GroupsImInViewController: UIViewController {
         if PFUser.currentUser()!.username! == String(groupToPass["groupLeaderUsername"]!) {
             partyViewController.userCannotEdit = false
         } else {
-            print("current user is not the leader")
+            //print("current user is not the leader")
             partyViewController.userCannotEdit = true
         }
         groupsImInTableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
-//    func updateGroupsImIn() {
-//        print("got into selector updateGroups")
-//        groupsImInList = dataManager.allGroups
-//        groupsImInTableView.reloadData()
-//        
-//    }
+    func updateGroupsImIn() {
+        //print("got into selector updateGroups")
+        groupsImInList = dataManager.allGroups
+        groupsImInTableView.reloadData()
+        
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateGroupsImIn", name: "gotGroupsImIn", object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        print("groups im in VWA")
-        dataManager.queryGroupsImIn()
-       groupsImInTableView.backgroundColor = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
-        
+        //print("groupsImInList count is \(groupsImInList.count)")
+        if (groupsImInList.count == 0) {
+            dataManager.queryGroupsImIn()
+        }
+       groupsImInTableView.backgroundColor = UIColor(red: 77/255, green: 174/255, blue: 255/255, alpha: 0.85)
     }
 
     override func didReceiveMemoryWarning() {

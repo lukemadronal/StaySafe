@@ -41,9 +41,9 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     func requestAccessToContactType(type: CNEntityType) {
         contactStore.requestAccessForEntityType(type) { (accessGranted: Bool, error: NSError?) -> Void in
             if accessGranted {
-                print("granted")
+                //print("granted")
             } else {
-                print("not granted")
+                //print("not granted")
             }
         }
     }
@@ -69,7 +69,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     }
     
     func contactViewController(viewController: CNContactViewController, didCompleteWithContact contact: CNContact?) {
-        print("done with " + contact!.familyName)
+        //print("done with " + contact!.familyName)
     }
     
     func presentContactMatchingName(name: String) {
@@ -78,11 +78,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         do {
             let contacts = try contactStore.unifiedContactsMatchingPredicate(predicate, keysToFetch: keysToFetch)
             if let firstContact = contacts.first {
-                print("Contact: " + firstContact.familyName)
+                //print("Contact: " + firstContact.familyName)
                 displayContact(firstContact)
             }
         } catch {
-            print("error")
+            //print("error")
         }
     }
     
@@ -91,14 +91,14 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         if contact.emailAddresses.count > 0 {
             contactEmail = contact.emailAddresses[0].value as! String
         } else {
-            print("no email listed")
+            //print("no email listed")
             contactEmail = " "
         }
         
         if let selectedUser = queryContactByEmail(contactEmail) {
             if !(selectedUser.objectId! == PFUser.currentUser()!.objectId) {
                 if editingGroup {
-                    print("added \(selectedUser.username) to already added users")
+                    //print("added \(selectedUser.username) to already added users")
                     alreadyAddedUsers.append(selectedUser)
                 } else {
                     usersToAddArray.append(selectedUser)
@@ -108,18 +108,18 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                 addingCurrentUser = true
             }
         } else {
-            print("email for user not found, looking for phone number")
+            //print("email for user not found, looking for phone number")
             var phoneNumbers = [String]()
             if contact.phoneNumbers.count > 0 {
                 for number in contact.phoneNumbers {
                     phoneNumbers.append(String((number.value as? CNPhoneNumber)!.valueForKey("digits")!))
                 }
-                print("phone numbers is \(phoneNumbers)")
+                //print("phone numbers is \(phoneNumbers)")
             } else {
-                print("no phone numbers found")
+                //print("no phone numbers found")
                 noUserFound = true
             }
-            print("query phone numbas is being called")
+            //print("query phone numbas is being called")
             dataManager.queryUserBasedOnPhoneNumber(phoneNumbers)
             
         }
@@ -145,7 +145,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         var userList = currentGroup!["groupList"] as! [String]
         let newACL = currentGroup!.ACL
         for user in alreadyAddedUsers {
-            print("alreadyaddedusers user name is: \(user.username))")
+            //print("alreadyaddedusers user name is: \(user.username))")
             if !user.isEqual(PFUser.currentUser()) {
                 newACL!.setReadAccess(true, forUser: user)
                 newACL!.setWriteAccess(true, forUser: user)
@@ -190,7 +190,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         newGroup.saveInBackgroundWithBlock {
             (success: Bool, error: NSError?) -> Void in
             if (success) {
-                print("Success Saving")
+                //print("Success Saving")
                 // The object has been saved.
                 dispatch_async(dispatch_get_main_queue()) {
                     NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
@@ -252,11 +252,11 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                             NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
                         }
                     } else {
-                        print("error while deleting group: \(error!.description)")
+                        //print("error while deleting group: \(error!.description)")
                     }
                 })
             } else {
-                print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
+                //print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
                 let newArray = uCurrentGroup["groupList"]
                 let indexForUsersArray = newArray.indexOfObject(PFUser.currentUser()!.objectId!)
                 newArray.removeObject(PFUser.currentUser()!.objectId!)
@@ -268,9 +268,9 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                 uCurrentGroup.ACL = newACL!
                 uCurrentGroup.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
                     if success {
-                        print("success saving")
+                        //print("success saving")
                     } else {
-                        print("the " + error!.description)
+                        //print("the " + error!.description)
                     }
                     
                 })
@@ -278,7 +278,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             }
             self.navigationController!.popToRootViewControllerAnimated(true)
         } else {
-            print("you need to have created a group to delete one")
+            //print("you need to have created a group to delete one")
         }
     }
     //MARK: - TableView Methods
@@ -310,7 +310,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                         cell.profPicThumbnail.image = image
                     }
                 } else {
-                    print("error in getting prof pic:\(error!.description)")
+                    //print("error in getting prof pic:\(error!.description)")
                 }
             })
         }
@@ -322,6 +322,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     }
     
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        print("currentUserLeadingGroup is \(currentUserLeadingGroup)")
         if currentUserLeadingGroup {
             if (editingStyle == .Delete) {
                 print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
@@ -338,9 +339,9 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                 
                 currentGroup!.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
                     if success {
-                        print("success saving")
+                        //print("success saving")
                     } else {
-                        print("the " + error!.description)
+                        //print("the " + error!.description)
                     }
                     
                 })
@@ -366,7 +367,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     func addUserByUsername() {
         if editingGroup {
-            print("added \(dataManager.userByUsername) to already added users")
+            //print("added \(dataManager.userByUsername) to already added users")
             alreadyAddedUsers.append(dataManager.userByUsername)
         } else {
             usersToAddArray.append(dataManager.userByUsername)
@@ -400,7 +401,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         if let selectedUser =  dataManager.userByPhoneNumber{
             if !(selectedUser.objectId! == PFUser.currentUser()!.objectId) {
                 if editingGroup {
-                    print("added \(selectedUser.username) to already added users")
+                    //print("added \(selectedUser.username) to already added users")
                     alreadyAddedUsers.append(selectedUser)
                 } else {
                     usersToAddArray.append(selectedUser)
@@ -419,15 +420,15 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     
     
-    func keyboardWasShown(notification: NSNotification) {
-        print("keyboard was shown")
-        var info = notification.userInfo!
-        var keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
-        
-        UIView.animateWithDuration(0.1, animations: { () -> Void in
-            self.friendsToAddBottomConstraint.constant = keyboardFrame.size.height + 20
-        })
-    }
+//    func keyboardWasShown(notification: NSNotification) {
+//        //print("keyboard was shown")
+//        var info = notification.userInfo!
+//        var keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
+//        
+//        UIView.animateWithDuration(0.1, animations: { () -> Void in
+//            self.friendsToAddBottomConstraint.constant = keyboardFrame.size.height + 20
+//        })
+//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -443,14 +444,15 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        friendsToAddTableView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
-//        view.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
+        friendsToAddTableView.backgroundColor = UIColor(red: 77/255, green: 174/255, blue: 255/255, alpha: 0.85)//        view.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
 //        backgroundView.backgroundColor = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.5)
         
         if let uCurrentGroup = currentGroup {
             print("unwrapped current group which means editing")
             editingGroup = true
-            dataManager.queryGroupListToFriendList(uCurrentGroup)
+            if usersToAddArray.count == 0 {
+                dataManager.queryGroupListToFriendList(uCurrentGroup)
+            }
             groupNameTextField.text = String(uCurrentGroup["groupName"])
             if PFUser.currentUser()!.username == String(uCurrentGroup["groupName"]) {
                 currentUserLeadingGroup = true
@@ -458,7 +460,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
                 currentUserLeadingGroup = false
             }
         } else {
-            print("not editing group")
+            ////print("not editing group")
             editingGroup = false
         }
         if noUserFound {

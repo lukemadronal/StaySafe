@@ -38,7 +38,6 @@ class ProfileViewController: UIViewController, UITextFieldDelegate, UIImagePicke
             currentUser["phoneNumber"] = phoneTextField.text
             currentUser["username"] = usernameTextField.text
             currentUser["name"] = nameTextField.text
-            
             let imageData = UIImageJPEGRepresentation(selectedImageView.image!, 1.0)
             let imageFile = PFFile(name:"\(nameTextField.text!)ProfilePicture.png", data:imageData!)
             currentUser["imageName"] = "\(nameTextField.text!)Picture"
@@ -80,7 +79,7 @@ class ProfileViewController: UIViewController, UITextFieldDelegate, UIImagePicke
     //MARK: - Image Capture/Save Methods
     
     @IBAction func galleryButtonTapped(sender : UIBarButtonItem){
-        print("Gallery Button Pressed")
+        //print("Gallery Button Pressed")
         let ipc = UIImagePickerController()
         ipc.delegate = self
         ipc.sourceType = .SavedPhotosAlbum
@@ -88,7 +87,7 @@ class ProfileViewController: UIViewController, UITextFieldDelegate, UIImagePicke
     }
     
     @IBAction func cameraButtonTapped(sender : UIBarButtonItem){
-        print("Camera Button Pressed")
+        //print("Camera Button Pressed")
         let ipc = UIImagePickerController()
         ipc.delegate = self
         ipc.sourceType = .Camera
@@ -98,11 +97,10 @@ class ProfileViewController: UIViewController, UITextFieldDelegate, UIImagePicke
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         if let pickedImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            print("got into image picker and unwrapped image")
+            //print("got into image picker and unwrapped image")
             selectedImageView.contentMode = .ScaleAspectFit
             selectedImageView.image = pickedImage
         }
-        
         dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -114,9 +112,12 @@ class ProfileViewController: UIViewController, UITextFieldDelegate, UIImagePicke
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "dismissKeyboard")
         view.addGestureRecognizer(tap)
         
-        let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
-        let color2 = UIColor(red: 255/255, green: 90/255, blue: 114/255, alpha: 0.85)
-        let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
+        //let color1 = UIColor(red: 255/255, green: 106/255, blue: 99/255, alpha: 0.85)
+        let color1 = UIColor(red: 77/255, green: 174/255, blue: 255/255, alpha: 1)
+        //let color2 = UIColor(red: 77/255, green: 106/255, blue: 99/255, alpha: 0.85)
+        let color2 = UIColor(red: 77/255, green: 128/255, blue: 255/255, alpha: 1)
+        //let color3 = UIColor(red: 222/255, green: 98/255, blue: 135/255, alpha: 0.85)
+        let color3 = UIColor(red: 69/255, green: 91/255, blue: 255/255, alpha: 1)
         view1.backgroundColor = color1
         view2.backgroundColor = color2
         view3.backgroundColor = color3
@@ -149,9 +150,7 @@ class ProfileViewController: UIViewController, UITextFieldDelegate, UIImagePicke
             if let name = currentUser["name"] as? String {
                 nameTextField.text = name
             }
-            
         }
-        
     }
 
     override func didReceiveMemoryWarning() {
