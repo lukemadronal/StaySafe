@@ -8,6 +8,7 @@
 
 import UIKit
 import Parse
+import MapKit
 
 class DataManager: NSObject {
     static let sharedInstance = DataManager()
@@ -24,6 +25,10 @@ class DataManager: NSObject {
     var groupsCount = Int32()
     var pfGeoPointCount = Int32()
     var currentGroupName = ""
+    
+    var friendsMap: MKMapView!
+    var increment = 0
+    var currentUserForLocHistory : PFUser?
     
     
     func findMyGroups() {
@@ -199,14 +204,74 @@ class DataManager: NSObject {
     }
     
     func countUserLocHistory() {
-        let query = PFQuery(className:"UserLocHistory")
-        query.whereKey("user", equalTo:PFUser.currentUser()!.username!)
-        query.countObjectsInBackgroundWithBlock({ (count, error) -> Void in
-            self.pfGeoPointCount = count
-            dispatch_async(dispatch_get_main_queue()) {
-                NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParseVC", object: nil))
+        if let uCurrentUser = currentUserForLocHistory {
+            let query = PFQuery(className:"UserLocHistory")
+            query.whereKey("user", equalTo:uCurrentUser.username!)
+            query.countObjectsInBackgroundWithBlock({ (count, error) -> Void in
+                self.pfGeoPointCount = count
+                dispatch_async(dispatch_get_main_queue()) {
+                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "receivedDataFromParseVC", object: nil))
+                }
+            })
+        }
+    }
+    
+    func queryUserLocHistory() {
+        if let uCurrentUser = currentUserForLocHistory {
+            let query = PFQuery(className:"UserLocHistory")
+            print("current user is \(uCurrentUser.username!)")
+            query.whereKey("user", equalTo: uCurrentUser.username!)
+            query.limit = 200
+            query.skip = Int(200 * increment)
+            query.findObjectsInBackgroundWithBlock {
+                (objects: [PFObject]?, error: NSError?) -> Void in
+                if error == nil {
+                    // The find succeeded.
+                    // Do something with the found objects
+                    if let uObjects = objects {
+                        print("retrieved \(uObjects.count) objects")
+                        for geoPoint in uObjects {
+                            let geo = geoPoint["currentLoc"]
+                            
+                            let dateFormatter = NSDateFormatter()
+                            dateFormatter.dateFormat = "hh:mm MM/dd/yyyy"
+                            let dateTitle = dateFormatter.stringFromDate(geoPoint.createdAt! as NSDate)
+                            
+                            self.addAnnotationToMapView(geo.latitude, long: geo.longitude, title: dateTitle)
+                        }
+                    }
+                } else {
+                    print("Error: \(error!) \(error!.userInfo)")
+                }
+                print("inc is \(self.increment)")
+                print("count / 100 is \(Int(self.pfGeoPointCount / 200))")
+                if self.increment < Int(self.pfGeoPointCount / 200) {
+                    print("got into bottom loop. inc is \(self.increment)")
+                    dispatch_async(dispatch_get_main_queue()) {
+                        NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "newSkipCall", object: nil))
+                    }
+                }
             }
-        })
+        }
+    }
+    
+    
+    func addAnnotationToMapView(lat: Double, long: Double, title: String) {
+        let latDelta:CLLocationDegrees = 0.01
+        
+        let longDelta:CLLocationDegrees = 0.01
+        
+        let theSpan:MKCoordinateSpan = MKCoordinateSpanMake(latDelta, longDelta)
+        let pointLocation:CLLocationCoordinate2D = CLLocationCoordinate2DMake(lat, long)
+        
+        let region:MKCoordinateRegion = MKCoordinateRegionMake(pointLocation, theSpan)
+        friendsMap.setRegion(region, animated: true)
+        
+        let pinLocation : CLLocationCoordinate2D = CLLocationCoordinate2DMake(lat, long)
+        let objectAnnotation = MKPointAnnotation()
+        objectAnnotation.coordinate = pinLocation
+        objectAnnotation.title = title
+        self.friendsMap.addAnnotation(objectAnnotation)
     }
     
 }
