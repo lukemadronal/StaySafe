@@ -26,6 +26,7 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     var contactStore = CNContactStore()
     var dataManager = DataManager()
+    var contactManager = ContactManager()
     
     var usersToAddArray = [PFUser]()
     var alreadyAddedUsers = [PFUser]()
@@ -94,7 +95,6 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             //print("no email listed")
             contactEmail = " "
         }
-        
         if let selectedUser = queryContactByEmail(contactEmail) {
             if !(selectedUser.objectId! == PFUser.currentUser()!.objectId) {
                 if editingGroup {
@@ -121,7 +121,6 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
             }
             //print("query phone numbas is being called")
             dataManager.queryUserBasedOnPhoneNumber(phoneNumbers)
-            
         }
     }
     
@@ -141,86 +140,14 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         }
     }
     
-    func editGroup() {
-        var userList = currentGroup!["groupList"] as! [String]
-        let newACL = currentGroup!.ACL
-        for user in alreadyAddedUsers {
-            //print("alreadyaddedusers user name is: \(user.username))")
-            if !user.isEqual(PFUser.currentUser()) {
-                newACL!.setReadAccess(true, forUser: user)
-                newACL!.setWriteAccess(true, forUser: user)
-                if !userList.contains(user.objectId!) {
-                    userList.append(user.objectId!)
-                }
-            }
-        }
-        currentGroup!.ACL = newACL
-        currentGroup!["groupList"] = userList
-        currentGroup!["groupName"] = groupNameTextField!.text!
-        currentGroup!.saveInBackgroundWithBlock { (success, error) -> Void in
-            if success {
-                let alert = UIAlertController(title: "Success!", message: "Your group has been successfully edited :)", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
-                    self.navigationController!.popToRootViewControllerAnimated(true)
-                }))
-                self.presentViewController(alert, animated: true, completion: nil)
-            }
-        }
-        
-    }
-    
-    func addUserToGroup(user:PFUser, usersToAdd: [PFUser], groupName: String) {
-        let newGroup = PFObject(className:"Groups")
-        newGroup["groupName"] = groupName
-        newGroup["groupLeaderUsername"] = user.username!
-        var userList = [String]()
-        let newACL = PFACL()
-        newACL.setReadAccess(true, forUser: user)
-        newACL.setWriteAccess(true, forUser: user)
-        userList.append(user.objectId!)
-        
-        
-        for userToAdd in usersToAdd {
-            newACL.setReadAccess(true, forUser: userToAdd)
-            newACL.setWriteAccess(true, forUser: userToAdd)
-            userList.append(userToAdd.objectId!)
-        }
-        newGroup.ACL = newACL
-        newGroup["groupList"] = userList
-        newGroup.saveInBackgroundWithBlock {
-            (success: Bool, error: NSError?) -> Void in
-            if (success) {
-                //print("Success Saving")
-                // The object has been saved.
-                dispatch_async(dispatch_get_main_queue()) {
-                    NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
-                }
-                let alert = UIAlertController(title: "Success!", message: "Your group has been successfully created :)", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
-                    self.navigationController!.popToRootViewControllerAnimated(true)
-                }))
-                
-                
-                self.presentViewController(alert, animated: true, completion: nil)
-                
-            } else {
-                let alert = UIAlertController(title: "Error!", message: "There was a problem with your group, please try again later! :(", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
-                self.presentViewController(alert, animated: true, completion: nil)
-                // There was a problem, check error.description
-            }
-        }
-        currentGroup = newGroup
-    }
-    
     //MARK: - Interactivity Methods
     
     @IBAction func addAllButtonPressed(sender: UIBarButtonItem) {
         if groupNameTextField.text != ""  {
             if editingGroup {
-                editGroup()
+                contactManager.editGroup(currentGroup!, groupName: groupNameTextField.text!, alreadyAddedUsers: alreadyAddedUsers)
             } else {
-                addUserToGroup(PFUser.currentUser()!, usersToAdd: usersToAddArray, groupName: groupNameTextField.text!)
+                currentGroup = contactManager.addUserToGroup(PFUser.currentUser()!, usersToAdd: usersToAddArray, groupName: groupNameTextField.text!)
             }
             usersToAddArray.removeAll()
             currentGroup = nil
@@ -234,7 +161,6 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     @IBAction func searchForFriendByUsername(sender: UIButton) {
         let username = enterUsernameTextField!.text!
         dataManager.queryUserByUserName(username)
-        
     }
     
     @IBAction func addFriendButtonPressed(sender: UIButton) {
@@ -245,58 +171,14 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     @IBAction func deleteBarButtonPressed(sender: UIBarButtonItem) {
         if let uCurrentGroup = currentGroup {
-            if currentUserLeadingGroup {
-                uCurrentGroup.deleteInBackgroundWithBlock({ (success, error) -> Void in
-                    if success {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            NSNotificationCenter.defaultCenter().postNotification(NSNotification(name: "updatedGroup", object: nil))
-                        }
-                    } else {
-                        //print("error while deleting group: \(error!.description)")
-                    }
-                })
-            } else {
-                //print("group name is \(currentGroup!["groupName"]) and \(currentGroup!["groupList"])")
-                let newArray = uCurrentGroup["groupList"]
-                let indexForUsersArray = newArray.indexOfObject(PFUser.currentUser()!.objectId!)
-                newArray.removeObject(PFUser.currentUser()!.objectId!)
-                
-                uCurrentGroup["groupList"] = newArray
-                let newACL = uCurrentGroup.ACL
-                newACL!.setReadAccess(false, forUser: PFUser.currentUser()!)
-                newACL!.setWriteAccess(false, forUser: PFUser.currentUser()!)
-                uCurrentGroup.ACL = newACL!
-                uCurrentGroup.saveInBackgroundWithBlock({ (success: Bool, error: NSError?) -> Void in
-                    if success {
-                        //print("success saving")
-                    } else {
-                        //print("the " + error!.description)
-                    }
-                    
-                })
-                usersToAddArray.removeAtIndex(indexForUsersArray)
-            }
+            usersToAddArray = contactManager.deleteGroup(uCurrentGroup, usersToAddArray: usersToAddArray)
             self.navigationController!.popToRootViewControllerAnimated(true)
-        } else {
-            //print("you need to have created a group to delete one")
         }
     }
     //MARK: - TableView Methods
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return usersToAddArray.count
-        
     }
-    /*
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> ContactTableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! ContactTableViewCell
-        
-        let currentContact = contactArray[indexPath.row]
-        cell.nameLabel.text = filterContactsByCategory(sectionsArray[indexPath.section], sortLastName:  sortByLastName)[indexPath.row].nameLast
-        //cell.nameLabel.text = currentContact.nameLast
-        cell.emailLabel.text = "Rating: \(String(Int(currentContact.rating!))) "
-        return cell
-    }
-    */
     
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UserTableViewCell {
@@ -358,7 +240,8 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         mapViewController.currentUser = userToPass
     }
     
-    //MARK: - Life Cycle Methods
+    //MARK: - Notification Selector Methods
+    
     func sendUsersList() {
         usersToAddArray = dataManager.listOfUsers
         //alreadyAddedUsers = dataManager.listOfUsers
@@ -367,8 +250,9 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
     
     func addUserByUsername() {
         if editingGroup {
-            //print("added \(dataManager.userByUsername) to already added users")
+            print("added \(dataManager.userByUsername) to already added users")
             alreadyAddedUsers.append(dataManager.userByUsername)
+            usersToAddArray.append(dataManager.userByUsername)
         } else {
             usersToAddArray.append(dataManager.userByUsername)
         }
@@ -418,20 +302,44 @@ class PartyViewController: UIViewController,CNContactPickerDelegate, CNContactVi
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func groupSuccessfullyCreatedNotification() {
+        let alert = UIAlertController(title: "Success!", message: "Your group has been successfully created :)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+            self.navigationController!.popToRootViewControllerAnimated(true)
+        }))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
     
+    func groupFailureCreatedNotification() {
+        let alert = UIAlertController(title: "Error!", message: "There was a problem with your group, please try again later! :(", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    func groupSuccessfullyEditedNotification() {
+        let alert = UIAlertController(title: "Success!", message: "Your group has been successfully edited :)", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+            self.navigationController!.popToRootViewControllerAnimated(true)
+        }))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
     
-//    func keyboardWasShown(notification: NSNotification) {
-//        //print("keyboard was shown")
-//        var info = notification.userInfo!
-//        var keyboardFrame: CGRect = (info[UIKeyboardFrameEndUserInfoKey] as! NSValue).CGRectValue()
-//        
-//        UIView.animateWithDuration(0.1, animations: { () -> Void in
-//            self.friendsToAddBottomConstraint.constant = keyboardFrame.size.height + 20
-//        })
-//    }
+    func groupFailureEditedNotification() {
+        let alert = UIAlertController(title: "Error!", message: "Failed to edit your group :(", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
+            self.navigationController!.popToRootViewControllerAnimated(true)
+        }))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    //MARK: - Life Cycle Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "groupSuccessfullyEditedNotification", name: "successEditingGroup", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "groupFailureEditedNotification", name: "failureCreatingGroup", object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "groupSuccessfullyCreatedNotification", name: "successCreatingGroup", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "groupFailureCreatedNotification", name: "failureCreatingGroup", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "sendUsersList", name: "gotUserList", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "addUserByUsername", name: "gotUserByUserName", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "noUserNameRecieved", name: "noUsernamePopUpErrorMessage", object: nil)

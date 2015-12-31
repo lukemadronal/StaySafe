@@ -46,9 +46,7 @@ class MapViewController: UIViewController {
                 //return nil so map view draws "blue dot" for standard user location
                 return nil
             }
-            
             let reuseId = "pin"
-            
             var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
             if pinView == nil {
                 pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
@@ -59,7 +57,6 @@ class MapViewController: UIViewController {
             else {
                 pinView!.annotation = annotation
             }
-            
             return pinView
     }
     
